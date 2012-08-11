@@ -5,17 +5,26 @@ using System.Text;
 
 namespace OnlineRadio.Core
 {
-    public class OnlineRadio
+    public class Radio : IDisposable
     {
-        string Url
+        public string Url
         {
             get;
             private set;
         }
 
-        public OnlineRadio(string Url)
+        public Radio(string Url)
         {
             this.Url = Url;
+        }
+
+        bool Start()
+        {
+            return false;
+        }
+
+        public void Dispose()
+        {
         }
     }
 }
