@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Net;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace OnlineRadio.Core
 {
@@ -34,12 +35,28 @@ namespace OnlineRadio.Core
             }
         }
         string _metadata;
-
         public event Action<string, string> OnMetadataChanged;
+
+        public SongInfo CurrentSong
+        {
+            get
+            {
+                return _currentSong;
+            }
+            private set
+            {
+                if (OnCurrentSongChanged != null)
+                    OnCurrentSongChanged(_currentSong, value);
+                _currentSong = value;
+            }
+        }
+        SongInfo _currentSong;
+        public event Action<SongInfo, SongInfo> OnCurrentSongChanged;
 
         public Radio(string Url)
         {
             this.Url = Url;
+            OnMetadataChanged += UpdateCurrentSong;
         }
 
         public void Start()
@@ -109,9 +126,39 @@ namespace OnlineRadio.Core
             }
         }
 
+        void UpdateCurrentSong(string oldMetadata, string newMetadata)
+        {
+            const string metadataSongPattern = @"StreamTitle='(?<artist>.+) - (?<title>.+)';";
+            Match match = Regex.Match(newMetadata, metadataSongPattern);
+            if (!match.Success)
+                CurrentSong = null;
+            else
+                CurrentSong = new SongInfo(match.Groups["artist"].Value, match.Groups["title"].Value);
+        }
+
         public void Dispose()
         {
             Running = false;
+        }
+
+        public class SongInfo
+        {
+            public string Artist
+            {
+                get;
+                private set;
+            }
+            public string Title
+            {
+                get;
+                private set;
+            }
+
+            public SongInfo(string Artist, string Title)
+            {
+                this.Artist = Artist;
+                this.Title = Title;
+            }
         }
     }
 }

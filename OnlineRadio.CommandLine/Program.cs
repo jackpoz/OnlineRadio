@@ -17,9 +17,9 @@ namespace OnlineRadio.CommandLine
                     case "-url":
                         using (Radio radio = new Radio(args[1]))
                         {
-                            radio.OnMetadataChanged += (oldValue, newValue) =>
+                            radio.OnCurrentSongChanged += (oldValue, newValue) =>
                                 {
-                                    Console.WriteLine(newValue);
+                                    Console.WriteLine(newValue.Artist + " - " + newValue.Title);
                                 };
                             radio.Start();
                             Console.ReadLine();
