@@ -10,7 +10,6 @@ namespace OnlineRadio.Core
 {
     public class Radio : IDisposable
     {
-
         public string Url
         {
             get;
@@ -30,12 +29,12 @@ namespace OnlineRadio.Core
             private set
             {
                 if (OnMetadataChanged != null)
-                    OnMetadataChanged(_metadata, value);
+                    OnMetadataChanged(this, new MetadataEventArgs(_metadata, value));
                 _metadata = value;
             }
         }
         string _metadata;
-        public event Action<string, string> OnMetadataChanged;
+        public event EventHandler<MetadataEventArgs> OnMetadataChanged;
 
         public SongInfo CurrentSong
         {
@@ -46,12 +45,12 @@ namespace OnlineRadio.Core
             private set
             {
                 if (OnCurrentSongChanged != null)
-                    OnCurrentSongChanged(_currentSong, value);
+                    OnCurrentSongChanged(this, new CurrentSongEventArgs(_currentSong, value));
                 _currentSong = value;
             }
         }
         SongInfo _currentSong;
-        public event Action<SongInfo, SongInfo> OnCurrentSongChanged;
+        public event EventHandler<CurrentSongEventArgs> OnCurrentSongChanged;
 
         public Radio(string Url)
         {
@@ -126,10 +125,10 @@ namespace OnlineRadio.Core
             }
         }
 
-        void UpdateCurrentSong(string oldMetadata, string newMetadata)
+        void UpdateCurrentSong(object sender, MetadataEventArgs args)
         {
             const string metadataSongPattern = @"StreamTitle='(?<artist>.+) - (?<title>.+)';";
-            Match match = Regex.Match(newMetadata, metadataSongPattern);
+            Match match = Regex.Match(args.NewMetadata, metadataSongPattern);
             if (!match.Success)
                 CurrentSong = null;
             else
@@ -140,25 +139,49 @@ namespace OnlineRadio.Core
         {
             Running = false;
         }
+    }
 
-        public class SongInfo
+    public class SongInfo
+    {
+        public string Artist
         {
-            public string Artist
-            {
-                get;
-                private set;
-            }
-            public string Title
-            {
-                get;
-                private set;
-            }
+            get;
+            private set;
+        }
+        public string Title
+        {
+            get;
+            private set;
+        }
 
-            public SongInfo(string Artist, string Title)
-            {
-                this.Artist = Artist;
-                this.Title = Title;
-            }
+        public SongInfo(string Artist, string Title)
+        {
+            this.Artist = Artist;
+            this.Title = Title;
+        }
+    }
+
+    public class MetadataEventArgs : EventArgs
+    {
+        public string OldMetadata { get; private set; }
+        public string NewMetadata { get; private set; }
+
+        public MetadataEventArgs(string OldMetadata, string NewMetadata)
+        {
+            this.OldMetadata = OldMetadata;
+            this.NewMetadata = NewMetadata;
+        }
+    }
+
+    public class CurrentSongEventArgs : EventArgs
+    {
+        public SongInfo OldSong { get; private set; }
+        public SongInfo NewSong { get; private set; }
+
+        public CurrentSongEventArgs(SongInfo OldSong, SongInfo NewSong)
+        {
+            this.OldSong = OldSong;
+            this.NewSong = NewSong;
         }
     }
 }
