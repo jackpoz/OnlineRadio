@@ -40,6 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IPlugin.cs" />
+    <Compile Include="PluginManager.cs" />
     <Compile Include="Radio.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

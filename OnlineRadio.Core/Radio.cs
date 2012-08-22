@@ -52,10 +52,13 @@ namespace OnlineRadio.Core
         SongInfo _currentSong;
         public event EventHandler<CurrentSongEventArgs> OnCurrentSongChanged;
 
+        PluginManager pluginManager;
+
         public Radio(string Url)
         {
             this.Url = Url;
             OnMetadataChanged += UpdateCurrentSong;
+            pluginManager = new PluginManager();
         }
 
         public void Start()
@@ -64,6 +67,8 @@ namespace OnlineRadio.Core
             request.Headers.Add("icy-metadata", "1");
             Running = true;
             request.BeginGetResponse(GotResponse, request);
+            pluginManager.LoadPlugins(Directory.GetCurrentDirectory());
+            OnCurrentSongChanged += pluginManager.OnCurrentSongChanged;
         }
 
         void GotResponse(IAsyncResult result)
@@ -138,6 +143,7 @@ namespace OnlineRadio.Core
         public void Dispose()
         {
             Running = false;
+            pluginManager.Dispose();
         }
     }
 
