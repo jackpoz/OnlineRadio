@@ -65,7 +65,7 @@ namespace OnlineRadio.Core
         {
             if (pluginsPath == null)
                 pluginsPath = Directory.GetCurrentDirectory() + "\\plugins";
-            pluginManager.LoadPlugins(pluginsPath); pluginManager.ReloadPlugins(); pluginManager.ReloadPlugins(); pluginManager.ReloadPlugins();
+            pluginManager.LoadPlugins(pluginsPath);
             OnCurrentSongChanged += pluginManager.OnCurrentSongChanged;
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url);
             request.Headers.Add("icy-metadata", "1");
