@@ -49,6 +49,12 @@ namespace OnlineRadio.Core
 
         public void UnloadPlugins()
         {
+            foreach (var plugin in plugins)
+            {
+                IDisposable disposablePlugin = plugin as IDisposable;
+                if (disposablePlugin != null)
+                    disposablePlugin.Dispose();
+            }
             plugins.Clear();
         }
 
