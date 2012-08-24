@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
+using System.Reflection;
 
 namespace OnlineRadio.Core
 {
@@ -18,12 +20,36 @@ namespace OnlineRadio.Core
         public void LoadPlugins(string path)
         {
             this.path = path;
-            throw new NotImplementedException();
+            DirectoryInfo dir = new DirectoryInfo(path);
+            if (!dir.Exists)
+                return;
+            Type pluginType = typeof(IPlugin);
+            foreach (FileInfo fileInfo in dir.GetFiles("*.dll"))
+            {
+                try
+                {
+                    Assembly assembly = Assembly.LoadFile(fileInfo.FullName);
+                    foreach (var type in assembly.GetTypes())
+                    {
+                        if (!type.IsInterface &&
+                            !type.IsAbstract &&
+                            pluginType.IsAssignableFrom(type))
+                        {
+                            IPlugin plugin = (IPlugin)Activator.CreateInstance(type);
+                            plugins.Add(plugin);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
         }
 
         public void UnloadPlugins()
         {
-            throw new NotImplementedException();
+            plugins.Clear();
         }
 
         public void ReloadPlugins()

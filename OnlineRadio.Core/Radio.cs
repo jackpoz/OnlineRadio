@@ -61,14 +61,16 @@ namespace OnlineRadio.Core
             pluginManager = new PluginManager();
         }
 
-        public void Start()
+        public void Start(string pluginsPath = null)
         {
+            if (pluginsPath == null)
+                pluginsPath = Directory.GetCurrentDirectory() + "\\plugins";
+            pluginManager.LoadPlugins(pluginsPath); pluginManager.ReloadPlugins(); pluginManager.ReloadPlugins(); pluginManager.ReloadPlugins();
+            OnCurrentSongChanged += pluginManager.OnCurrentSongChanged;
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url);
             request.Headers.Add("icy-metadata", "1");
             Running = true;
             request.BeginGetResponse(GotResponse, request);
-            pluginManager.LoadPlugins(Directory.GetCurrentDirectory());
-            OnCurrentSongChanged += pluginManager.OnCurrentSongChanged;
         }
 
         void GotResponse(IAsyncResult result)
