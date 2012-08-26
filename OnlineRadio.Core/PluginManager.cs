@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace OnlineRadio.Core
 {
@@ -72,7 +73,7 @@ namespace OnlineRadio.Core
         public void OnCurrentSongChanged(object sender, CurrentSongEventArgs args)
         {
             foreach (var plugin in plugins)
-                plugin.OnCurrentSongChanged(sender, args);
+                Task.Factory.StartNew(()=>plugin.OnCurrentSongChanged(sender, args));
         }
     }
 }
