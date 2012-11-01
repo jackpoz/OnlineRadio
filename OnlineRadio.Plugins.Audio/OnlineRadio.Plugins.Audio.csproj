@@ -2,20 +2,18 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{FE9C6360-0731-47D2-9342-8491FB14BCD7}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{810E32CA-D344-48BA-BFF2-ED89C46FDC66}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OnlineRadio.Console</RootNamespace>
-    <AssemblyName>OnlineRadio.Console</AssemblyName>
+    <RootNamespace>OnlineRadio.Plugins.Audio</RootNamespace>
+    <AssemblyName>OnlineRadio.Plugins.Audio</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,8 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -43,24 +40,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="AudioPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OnlineRadio.Core\OnlineRadio.Core.csproj">
       <Project>{5CBFAA75-D27E-45CE-9063-793DED2225C6}</Project>
       <Name>OnlineRadio.Core</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>echo Copying plugins...
-mkdir  "$(TargetDir)plugins\" 2&gt;nul
-copy "$(SolutionDir)OnlineRadio.Plugins.WLM\bin\$(ConfigurationName)\*.*" "$(TargetDir)plugins\" &gt;nul
-copy "$(SolutionDir)OnlineRadio.Plugins.Lyrics\bin\$(ConfigurationName)\*.*" "$(TargetDir)plugins\" &gt;nul
-copy "$(SolutionDir)OnlineRadio.Plugins.Audio\bin\$(ConfigurationName)\*.*" "$(TargetDir)plugins\" &gt;nul
-</PostBuildEvent>
-  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
