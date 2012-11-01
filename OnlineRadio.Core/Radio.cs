@@ -52,6 +52,8 @@ namespace OnlineRadio.Core
         SongInfo _currentSong;
         public event EventHandler<CurrentSongEventArgs> OnCurrentSongChanged;
 
+        public event EventHandler<StreamUpdateEventArgs> OnStreamUpdate;
+
         PluginManager pluginManager;
 
         public Radio(string Url)
@@ -67,6 +69,7 @@ namespace OnlineRadio.Core
                 pluginsPath = Directory.GetCurrentDirectory() + "\\plugins";
             pluginManager.LoadPlugins(pluginsPath);
             OnCurrentSongChanged += pluginManager.OnCurrentSongChanged;
+            OnStreamUpdate += pluginManager.OnStreamUpdate;
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url);
             request.Headers.Add("icy-metadata", "1");
             Running = true;
@@ -100,15 +103,18 @@ namespace OnlineRadio.Core
                             if (streamPosition + bytes <= metaInt)
                             {
                                 streamPosition += bytes;
+                                ProcessStreamData(buffer, 0, bytes);
                                 continue;
                             }
 
                             index = metaInt - streamPosition;
+                            ProcessStreamData(buffer, 0, index - 1);
                             metadataLength = Convert.ToInt32(buffer[index]) * 16;
                             //check if there's any metadata, otherwise skip to next block
                             if (metadataLength == 0)
                             {
                                 streamPosition = bytes - index - 1;
+                                ProcessStreamData(buffer, index + 1, streamPosition);
                                 continue;
                             }
                             index++;
@@ -124,6 +130,7 @@ namespace OnlineRadio.Core
                                 Metadata = metadataSb.ToString();
                                 metadataSb.Clear();
                                 streamPosition = bytes - index - 1;
+                                ProcessStreamData(buffer, index + 1, streamPosition);
                                 break;
                             }
                         }
@@ -140,6 +147,18 @@ namespace OnlineRadio.Core
                 CurrentSong = null;
             else
                 CurrentSong = new SongInfo(match.Groups["artist"].Value, match.Groups["title"].Value);
+        }
+
+        void ProcessStreamData(byte[] buffer, int offset, int length)
+        {
+            if (length < 1)
+                return;
+            if (OnStreamUpdate != null)
+            {
+                byte[] data = new byte[length];
+                Buffer.BlockCopy(buffer, offset, data, 0, length);
+                OnStreamUpdate(this, new StreamUpdateEventArgs(data));
+            }
         }
 
         public void Dispose()
@@ -190,6 +209,16 @@ namespace OnlineRadio.Core
         {
             this.OldSong = OldSong;
             this.NewSong = NewSong;
+        }
+    }
+
+    public class StreamUpdateEventArgs : EventArgs
+    {
+        public byte[] Data { get; private set; }
+
+        public StreamUpdateEventArgs(byte[] Data)
+        {
+            this.Data = Data;
         }
     }
 }

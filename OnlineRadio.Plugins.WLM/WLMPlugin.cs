@@ -77,5 +77,8 @@ namespace OnlineRadio.Plugins.WLM
         {
             SetSong(args.NewSong.Title, args.NewSong.Artist);
         }
+
+        void IPlugin.OnStreamUpdate(object sender, StreamUpdateEventArgs args)
+        {}
     }
 }

@@ -17,5 +17,10 @@ namespace OnlineRadio.Plugins.Lyrics
         {
             throw new NotImplementedException();
         }
+
+        void IPlugin.OnStreamUpdate(object sender, StreamUpdateEventArgs args)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
