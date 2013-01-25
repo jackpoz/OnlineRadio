@@ -52,14 +52,13 @@
       <Name>OnlineRadio.Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>echo Copying plugins...
-mkdir  "$(TargetDir)plugins\" 2&gt;nul
-copy "$(SolutionDir)OnlineRadio.Plugins.WLM\bin\$(ConfigurationName)\*.*" "$(TargetDir)plugins\" &gt;nul
-copy "$(SolutionDir)OnlineRadio.Plugins.Lyrics\bin\$(ConfigurationName)\*.*" "$(TargetDir)plugins\" &gt;nul
-copy "$(SolutionDir)OnlineRadio.Plugins.Audio\bin\$(ConfigurationName)\*.*" "$(TargetDir)plugins\" &gt;nul
-</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
