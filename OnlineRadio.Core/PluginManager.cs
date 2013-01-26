@@ -16,6 +16,20 @@ namespace OnlineRadio.Core
 
         public PluginManager()
         {
+            AppDomain.CurrentDomain.AssemblyResolve += CheckLoaded;
+        }
+
+        // Elsewhere in that file...
+        private static Assembly CheckLoaded(object sender, ResolveEventArgs args)
+        {
+            foreach (Assembly a in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                if (a.FullName.Equals(args.Name))
+                {
+                    return a;
+                }
+            }
+            return null;
         }
 
         public void LoadPlugins(string path)
@@ -79,7 +93,7 @@ namespace OnlineRadio.Core
         public void OnStreamUpdate(object sender, StreamUpdateEventArgs args)
         {
             foreach (var plugin in plugins)
-                Task.Factory.StartNew(() => plugin.OnStreamUpdate(sender, args));
+                plugin.OnStreamUpdate(sender, args);
         }
     }
 }
