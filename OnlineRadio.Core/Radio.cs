@@ -108,7 +108,7 @@ namespace OnlineRadio.Core
                             }
 
                             index = metaInt - streamPosition;
-                            ProcessStreamData(buffer, 0, index - 1);
+                            ProcessStreamData(buffer, 0, index);
                             metadataLength = Convert.ToInt32(buffer[index]) * 16;
                             //check if there's any metadata, otherwise skip to next block
                             if (metadataLength == 0)
