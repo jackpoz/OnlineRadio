@@ -5,6 +5,7 @@ using System.Text;
 using System.Net;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace OnlineRadio.Core
 {
@@ -17,9 +18,19 @@ namespace OnlineRadio.Core
         }
         public bool Running
         {
-            get;
-            set;
+            get
+            {
+                return _running;
+            }
+            set
+            {
+                _running = value;
+                if (!_running && runningTask != null)
+                    runningTask.Wait();
+            }
         }
+        bool _running;
+        Task runningTask;
         public string Metadata
         {
             get
@@ -70,16 +81,15 @@ namespace OnlineRadio.Core
             pluginManager.LoadPlugins(pluginsPath);
             OnCurrentSongChanged += pluginManager.OnCurrentSongChanged;
             OnStreamUpdate += pluginManager.OnStreamUpdate;
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url);
-            request.Headers.Add("icy-metadata", "1");
             Running = true;
-            request.BeginGetResponse(GotResponse, request);
+            runningTask = Task.Run(() => GetHttpStream());
         }
 
-        void GotResponse(IAsyncResult result)
+        void GetHttpStream()
         {
-            HttpWebRequest request = (HttpWebRequest)result.AsyncState;
-            using (HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(result))
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url);
+            request.Headers.Add("icy-metadata", "1");
+            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
             {
                 //get the position of metadata
                 int metaInt = Convert.ToInt32(response.GetResponseHeader("icy-metaint"));
