@@ -98,49 +98,54 @@ namespace OnlineRadio.Core
                     byte[] buffer = new byte[16384];
                     int metadataLength = 0;
                     int streamPosition = 0;
-                    int index = -1;
+                    int bufferPosition = 0;
+                    int readBytes = 0;
                     StringBuilder metadataSb = new StringBuilder();
-                    int bytes = 0;
 
                     while (Running)
                     {
-                        bytes = socketStream.Read(buffer, 0, buffer.Length);
-                        if (bytes < 0)
-                            throw new Exception("Nothing read");
+                        if (bufferPosition >= readBytes)
+                        {
+                            readBytes = socketStream.Read(buffer, 0, buffer.Length);
+                            bufferPosition = 0;
+                        }
+                        if (readBytes <= 0)
+                        {
+                            Console.WriteLine("Stream over");
+                            break;
+                        }
 
                         if (metadataLength == 0)
                         {
-                            if (streamPosition + bytes <= metaInt)
+                            if (streamPosition + readBytes - bufferPosition <= metaInt)
                             {
-                                streamPosition += bytes;
-                                ProcessStreamData(buffer, 0, bytes);
+                                streamPosition += readBytes - bufferPosition;
+                                ProcessStreamData(buffer, ref bufferPosition, readBytes - bufferPosition);
                                 continue;
                             }
 
-                            index = metaInt - streamPosition;
-                            ProcessStreamData(buffer, 0, index);
-                            metadataLength = Convert.ToInt32(buffer[index]) * 16;
+                            ProcessStreamData(buffer, ref bufferPosition, metaInt - streamPosition);
+                            metadataLength = Convert.ToInt32(buffer[bufferPosition++]) * 16;
                             //check if there's any metadata, otherwise skip to next block
                             if (metadataLength == 0)
                             {
-                                streamPosition = bytes - index - 1;
-                                ProcessStreamData(buffer, index + 1, streamPosition);
+                                streamPosition = Math.Min(readBytes - bufferPosition, metaInt);
+                                ProcessStreamData(buffer, ref bufferPosition, streamPosition);
                                 continue;
                             }
-                            index++;
                         }
 
                         //get the metadata and reset the position
-                        for (; index < bytes; index++)
+                        while (bufferPosition < readBytes)
                         {
-                            metadataSb.Append(Convert.ToChar(buffer[index]));
+                            metadataSb.Append(Convert.ToChar(buffer[bufferPosition++]));
                             metadataLength--;
                             if (metadataLength == 0)
                             {
                                 Metadata = metadataSb.ToString();
                                 metadataSb.Clear();
-                                streamPosition = bytes - index - 1;
-                                ProcessStreamData(buffer, index + 1, streamPosition);
+                                streamPosition = Math.Min(readBytes - bufferPosition, metaInt);
+                                ProcessStreamData(buffer, ref bufferPosition, streamPosition);
                                 break;
                             }
                         }
@@ -159,7 +164,7 @@ namespace OnlineRadio.Core
                 CurrentSong = new SongInfo(match.Groups["artist"].Value, match.Groups["title"].Value);
         }
 
-        void ProcessStreamData(byte[] buffer, int offset, int length)
+        void ProcessStreamData(byte[] buffer, ref int offset, int length)
         {
             if (length < 1)
                 return;
@@ -169,6 +174,7 @@ namespace OnlineRadio.Core
                 Buffer.BlockCopy(buffer, offset, data, 0, length);
                 OnStreamUpdate(this, new StreamUpdateEventArgs(data));
             }
+            offset += length;
         }
 
         public void Dispose()
