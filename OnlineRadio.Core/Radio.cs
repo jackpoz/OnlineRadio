@@ -89,70 +89,77 @@ namespace OnlineRadio.Core
         {
             do
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url);
-                request.Headers.Add("icy-metadata", "1");
-                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                try
                 {
-                    //get the position of metadata
-                    int metaInt = Convert.ToInt32(response.GetResponseHeader("icy-metaint"));
-                    using (Stream socketStream = response.GetResponseStream())
+                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url);
+                    request.Headers.Add("icy-metadata", "1");
+                    using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
                     {
-                        byte[] buffer = new byte[16384];
-                        int metadataLength = 0;
-                        int streamPosition = 0;
-                        int bufferPosition = 0;
-                        int readBytes = 0;
-                        StringBuilder metadataSb = new StringBuilder();
-
-                        while (Running)
+                        //get the position of metadata
+                        int metaInt = Convert.ToInt32(response.GetResponseHeader("icy-metaint"));
+                        using (Stream socketStream = response.GetResponseStream())
                         {
-                            if (bufferPosition >= readBytes)
-                            {
-                                readBytes = socketStream.Read(buffer, 0, buffer.Length);
-                                bufferPosition = 0;
-                            }
-                            if (readBytes <= 0)
-                            {
-                                Console.WriteLine("Stream over");
-                                break;
-                            }
+                            byte[] buffer = new byte[16384];
+                            int metadataLength = 0;
+                            int streamPosition = 0;
+                            int bufferPosition = 0;
+                            int readBytes = 0;
+                            StringBuilder metadataSb = new StringBuilder();
 
-                            if (metadataLength == 0)
+                            while (Running)
                             {
-                                if (streamPosition + readBytes - bufferPosition <= metaInt)
+                                if (bufferPosition >= readBytes)
                                 {
-                                    streamPosition += readBytes - bufferPosition;
-                                    ProcessStreamData(buffer, ref bufferPosition, readBytes - bufferPosition);
-                                    continue;
+                                    readBytes = socketStream.Read(buffer, 0, buffer.Length);
+                                    bufferPosition = 0;
                                 }
-
-                                ProcessStreamData(buffer, ref bufferPosition, metaInt - streamPosition);
-                                metadataLength = Convert.ToInt32(buffer[bufferPosition++]) * 16;
-                                //check if there's any metadata, otherwise skip to next block
-                                if (metadataLength == 0)
+                                if (readBytes <= 0)
                                 {
-                                    streamPosition = Math.Min(readBytes - bufferPosition, metaInt);
-                                    ProcessStreamData(buffer, ref bufferPosition, streamPosition);
-                                    continue;
-                                }
-                            }
-
-                            //get the metadata and reset the position
-                            while (bufferPosition < readBytes)
-                            {
-                                metadataSb.Append(Convert.ToChar(buffer[bufferPosition++]));
-                                metadataLength--;
-                                if (metadataLength == 0)
-                                {
-                                    Metadata = metadataSb.ToString();
-                                    metadataSb.Clear();
-                                    streamPosition = Math.Min(readBytes - bufferPosition, metaInt);
-                                    ProcessStreamData(buffer, ref bufferPosition, streamPosition);
+                                    Console.WriteLine("Stream over");
                                     break;
+                                }
+
+                                if (metadataLength == 0)
+                                {
+                                    if (streamPosition + readBytes - bufferPosition <= metaInt)
+                                    {
+                                        streamPosition += readBytes - bufferPosition;
+                                        ProcessStreamData(buffer, ref bufferPosition, readBytes - bufferPosition);
+                                        continue;
+                                    }
+
+                                    ProcessStreamData(buffer, ref bufferPosition, metaInt - streamPosition);
+                                    metadataLength = Convert.ToInt32(buffer[bufferPosition++]) * 16;
+                                    //check if there's any metadata, otherwise skip to next block
+                                    if (metadataLength == 0)
+                                    {
+                                        streamPosition = Math.Min(readBytes - bufferPosition, metaInt);
+                                        ProcessStreamData(buffer, ref bufferPosition, streamPosition);
+                                        continue;
+                                    }
+                                }
+
+                                //get the metadata and reset the position
+                                while (bufferPosition < readBytes)
+                                {
+                                    metadataSb.Append(Convert.ToChar(buffer[bufferPosition++]));
+                                    metadataLength--;
+                                    if (metadataLength == 0)
+                                    {
+                                        Metadata = metadataSb.ToString();
+                                        metadataSb.Clear();
+                                        streamPosition = Math.Min(readBytes - bufferPosition, metaInt);
+                                        ProcessStreamData(buffer, ref bufferPosition, streamPosition);
+                                        break;
+                                    }
                                 }
                             }
                         }
                     }
+                }
+                catch(IOException ex)
+                {
+                    Console.WriteLine("Handled IOException, reconnecting. Details:\n{0}\n{1}", ex.Message, ex.StackTrace);
                 }
             } while (Running);
         }
