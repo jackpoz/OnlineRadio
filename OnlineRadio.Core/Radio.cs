@@ -6,6 +6,7 @@ using System.Net;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Net.Sockets;
 
 namespace OnlineRadio.Core
 {
@@ -157,9 +158,13 @@ namespace OnlineRadio.Core
                         }
                     }
                 }
-                catch(IOException ex)
+                catch (IOException ex)
                 {
                     Console.WriteLine("Handled IOException, reconnecting. Details:\n{0}\n{1}", ex.Message, ex.StackTrace);
+                }
+                catch (SocketException ex)
+                {
+                    Console.WriteLine("Handled SocketException, reconnecting. Details:\n{0}\n{1}", ex.Message, ex.StackTrace);
                 }
             } while (Running);
         }
