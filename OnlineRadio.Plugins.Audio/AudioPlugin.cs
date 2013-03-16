@@ -88,7 +88,7 @@ namespace OnlineRadio.Plugins.Audio
                             WaveFormat waveFormat = new Mp3WaveFormat(frame.SampleRate, frame.ChannelMode == ChannelMode.Mono ? 1 : 2, frame.FrameLength, frame.BitRate);
                             decompressor = new AcmMp3FrameDecompressor(waveFormat);
                             bufferedWaveProvider = new BufferedWaveProvider(decompressor.OutputFormat);
-                            bufferedWaveProvider.BufferDuration = TimeSpan.FromSeconds(20); // allow us to get well ahead of ourselves
+                            bufferedWaveProvider.BufferDuration = TimeSpan.FromSeconds(5); // allow us to get well ahead of ourselves
                         }
                         int decompressed = decompressor.DecompressFrame(frame, buffer, 0);
                         if (decompressed > 0)
@@ -99,7 +99,7 @@ namespace OnlineRadio.Plugins.Audio
                             firstLoop = false;
                             waveOut = CreateWaveOut();
                             volumeProvider = new VolumeWaveProvider16(bufferedWaveProvider);
-                            volumeProvider.Volume = 1f;
+                            volumeProvider.Volume = 0.5f;
                             waveOut.Init(volumeProvider);
                             waveOut.Play();
                         }
@@ -209,7 +209,6 @@ namespace OnlineRadio.Plugins.Audio
                     Buffer.BlockCopy(currentBlock, 0, buffer, offset + readCount, count - readCount);
                     //resize the queued buffer to store only the unread data
                     Buffer.BlockCopy(currentBlock, count - readCount, currentBlock, 0, currentBlock.Length - (count - readCount));
-                    //ToDo: use an offset on next Read() instead of resizing the array.
                     Array.Resize(ref currentBlock, currentBlock.Length - (count - readCount));
                     readCount = count;
                     break;
