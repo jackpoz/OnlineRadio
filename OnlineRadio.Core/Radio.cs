@@ -166,6 +166,10 @@ namespace OnlineRadio.Core
                 {
                     Console.WriteLine("Handled SocketException, reconnecting. Details:\n{0}\n{1}", ex.Message, ex.StackTrace);
                 }
+                catch (WebException ex)
+                {
+                    Console.WriteLine("Handled WebException, reconnecting. Details:\n{0}\n{1}", ex.Message, ex.StackTrace);
+                }
             } while (Running);
         }
 
