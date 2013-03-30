@@ -177,9 +177,7 @@ namespace OnlineRadio.Core
         {
             const string metadataSongPattern = @"StreamTitle='(?<artist>.+?) - (?<title>.+?)';";
             Match match = Regex.Match(args.NewMetadata, metadataSongPattern);
-            if (!match.Success)
-                CurrentSong = new SongInfo("", "");
-            else
+            if (match.Success)
                 CurrentSong = new SongInfo(match.Groups["artist"].Value, match.Groups["title"].Value);
         }
 
