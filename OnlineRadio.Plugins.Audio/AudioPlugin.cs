@@ -130,7 +130,8 @@ namespace OnlineRadio.Plugins.Audio
         public void Dispose()
         {
             IsPlaying = false;
-            playTask.Wait();
+            if(playTask != null)
+                playTask.Wait();
             stream.Dispose();
         }
     }
