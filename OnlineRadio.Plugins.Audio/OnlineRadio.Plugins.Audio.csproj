@@ -34,9 +34,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="NAudio, Version=1.7.0.10, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="NAudio, Version=1.7.0.11, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NAudio.1.7-alpha04\lib\net35\NAudio.dll</HintPath>
+      <HintPath>..\packages\NAudio.1.7-alpha05\lib\net35\NAudio.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
