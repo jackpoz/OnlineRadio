@@ -19,7 +19,7 @@ namespace OnlineRadio.Core
 
     public abstract class BasePlugin : IPlugin
     {
-        string IPlugin.Name
+        public string Name
         {
             get 
             { 
@@ -27,10 +27,10 @@ namespace OnlineRadio.Core
             }
         }
 
-        void IPlugin.OnCurrentSongChanged(object sender, CurrentSongEventArgs args)
+        public void OnCurrentSongChanged(object sender, CurrentSongEventArgs args)
         {}
 
-        void IPlugin.OnStreamUpdate(object sender, StreamUpdateEventArgs args)
+        public void OnStreamUpdate(object sender, StreamUpdateEventArgs args)
         { }
     }
 }

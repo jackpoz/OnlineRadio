@@ -49,17 +49,17 @@ namespace OnlineRadio.Plugins.Skype
             RemoveSong();
         }
 
-        string IPlugin.Name
+        public string Name
         {
             get { return "SkypePlugin"; }
         }
 
-        void IPlugin.OnCurrentSongChanged(object sender, CurrentSongEventArgs args)
+        public void OnCurrentSongChanged(object sender, CurrentSongEventArgs args)
         {
             SetSong(args.NewSong.Title, args.NewSong.Artist);
         }
 
-        void IPlugin.OnStreamUpdate(object sender, StreamUpdateEventArgs args)
+        public void OnStreamUpdate(object sender, StreamUpdateEventArgs args)
         { }
     }
 }

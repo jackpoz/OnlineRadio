@@ -8,19 +8,17 @@ namespace OnlineRadio.Plugins.Lyrics
 {
     public class LyricsPlugin : IPlugin
     {
-        string IPlugin.Name
+        public string Name
         {
             get { return "LyricsPlugin"; }
         }
 
-        void IPlugin.OnCurrentSongChanged(object sender, CurrentSongEventArgs args)
+        public void OnCurrentSongChanged(object sender, CurrentSongEventArgs args)
         {
-            throw new NotImplementedException();
         }
 
-        void IPlugin.OnStreamUpdate(object sender, StreamUpdateEventArgs args)
+        public void OnStreamUpdate(object sender, StreamUpdateEventArgs args)
         {
-            throw new NotImplementedException();
         }
     }
 }

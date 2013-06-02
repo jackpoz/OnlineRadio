@@ -12,7 +12,7 @@ namespace OnlineRadio.Plugins.Audio
 {
     public class AudioPlugin : IPlugin, IDisposable
     {
-        string IPlugin.Name
+        public string Name
         {
             get { return "AudioPlugin"; }
         }
@@ -28,10 +28,10 @@ namespace OnlineRadio.Plugins.Audio
             stream = new SlidingStream();
         }
 
-        void IPlugin.OnCurrentSongChanged(object sender, CurrentSongEventArgs args)
+        public void OnCurrentSongChanged(object sender, CurrentSongEventArgs args)
         {}
 
-        void IPlugin.OnStreamUpdate(object sender, StreamUpdateEventArgs args)
+        public void OnStreamUpdate(object sender, StreamUpdateEventArgs args)
         {
             stream.Write(args.Data, 0, args.Data.Length);
             if (!IsPlaying)
