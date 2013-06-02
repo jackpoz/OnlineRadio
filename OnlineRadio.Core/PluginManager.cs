@@ -57,7 +57,7 @@ namespace OnlineRadio.Core
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    Radio.Log(ex.Message, this);
                 }
             }
         }

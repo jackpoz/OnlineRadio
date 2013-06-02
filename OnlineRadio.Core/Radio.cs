@@ -66,6 +66,8 @@ namespace OnlineRadio.Core
 
         public event EventHandler<StreamUpdateEventArgs> OnStreamUpdate;
 
+        public static event EventHandler<MessageLogEventArgs> OnMessageLogged;
+
         PluginManager pluginManager;
 
         public Radio(string Url)
@@ -116,7 +118,7 @@ namespace OnlineRadio.Core
                                 }
                                 if (readBytes <= 0)
                                 {
-                                    Console.WriteLine("Stream over");
+                                    Radio.Log("Stream over", this);
                                     break;
                                 }
 
@@ -160,15 +162,15 @@ namespace OnlineRadio.Core
                 }
                 catch (IOException ex)
                 {
-                    Console.WriteLine("Handled IOException, reconnecting. Details:\n{0}\n{1}", ex.Message, ex.StackTrace);
+                    Radio.Log(string.Format("Handled IOException, reconnecting. Details:\n{0}\n{1}", ex.Message, ex.StackTrace), this);
                 }
                 catch (SocketException ex)
                 {
-                    Console.WriteLine("Handled SocketException, reconnecting. Details:\n{0}\n{1}", ex.Message, ex.StackTrace);
+                    Radio.Log(string.Format("Handled SocketException, reconnecting. Details:\n{0}\n{1}", ex.Message, ex.StackTrace), this);
                 }
                 catch (WebException ex)
                 {
-                    Console.WriteLine("Handled WebException, reconnecting. Details:\n{0}\n{1}", ex.Message, ex.StackTrace);
+                    Radio.Log(string.Format("Handled WebException, reconnecting. Details:\n{0}\n{1}", ex.Message, ex.StackTrace), this);
                 }
             } while (Running);
         }
@@ -192,6 +194,12 @@ namespace OnlineRadio.Core
                 OnStreamUpdate(this, new StreamUpdateEventArgs(data));
             }
             offset += length;
+        }
+
+        public static void Log(string Log, object sender)
+        {
+            if (OnMessageLogged != null)
+                OnMessageLogged(sender, new MessageLogEventArgs(Log));
         }
 
         public void Dispose()
@@ -252,6 +260,16 @@ namespace OnlineRadio.Core
         public StreamUpdateEventArgs(byte[] Data)
         {
             this.Data = Data;
+        }
+    }
+
+    public class MessageLogEventArgs : EventArgs
+    {
+        public string Message { get; private set; }
+
+        public MessageLogEventArgs(string Message)
+        {
+            this.Message = Message;
         }
     }
 }

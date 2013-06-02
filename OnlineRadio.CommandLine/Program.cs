@@ -21,6 +21,11 @@ namespace OnlineRadio.CommandLine
                                 {
                                     Console.WriteLine(eventArgs.NewSong.Artist + " - " + eventArgs.NewSong.Title);
                                 };
+
+                            Radio.OnMessageLogged += (sender, eventArgs) =>
+                            {
+                                Console.WriteLine(eventArgs.Message);
+                            };
                             radio.Start();
                             Console.ReadLine();
                             GC.KeepAlive(radio);
