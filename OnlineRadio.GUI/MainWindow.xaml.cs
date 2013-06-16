@@ -37,7 +37,12 @@ namespace OnlineRadio.GUI
 
         private void AddSourceBtn_Click(object sender, RoutedEventArgs e)
         {
-
+            SourceWindow window = new SourceWindow();
+            window.Owner = this;
+            window.Title = "Add new source";
+            if (window.ShowDialog() == true)
+            {
+            }
         }
 
         private void EditSourceBtn_Click(object sender, RoutedEventArgs e)
