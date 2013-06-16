@@ -24,5 +24,30 @@ namespace OnlineRadio.GUI
         {
             InitializeComponent();
         }
+
+        private void PlaySourceBtn_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void StopSourceBtn_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void AddSourceBtn_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void EditSourceBtn_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void RemoveSourceBtn_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
