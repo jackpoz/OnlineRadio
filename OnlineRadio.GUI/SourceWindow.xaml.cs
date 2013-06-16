@@ -19,16 +19,16 @@ namespace OnlineRadio.GUI
     /// </summary>
     public partial class SourceWindow : Window
     {
-        public string Name
+        public Source SourceResult
         {
             get;
-            private set;
+            set;
         }
 
-        public string Url
+        public SourceWindow(Source SourceInput) : this()
         {
-            get;
-            private set;
+            NameBox.Text = SourceInput.Name;
+            UrlBox.Text = SourceInput.Url;
         }
 
         public SourceWindow()
@@ -38,8 +38,7 @@ namespace OnlineRadio.GUI
 
         private void OkBtn_Click(object sender, RoutedEventArgs e)
         {
-            Name = NameBox.Text;
-            Url = UrlBox.Text;
+            SourceResult = new Source(NameBox.Text, UrlBox.Text);
             DialogResult = true;
         }
 

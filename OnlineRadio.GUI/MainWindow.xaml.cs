@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,9 +21,14 @@ namespace OnlineRadio.GUI
     /// </summary>
     public partial class MainWindow : Window
     {
+        ObservableCollection<Source> sources;
+
         public MainWindow()
         {
             InitializeComponent();
+
+            sources = new ObservableCollection<Source>();
+            SelectSourceCombo.ItemsSource = sources;
         }
 
         private void PlaySourceBtn_Click(object sender, RoutedEventArgs e)
@@ -42,6 +48,7 @@ namespace OnlineRadio.GUI
             window.Title = "Add new source";
             if (window.ShowDialog() == true)
             {
+                sources.Add(window.SourceResult);
             }
         }
 
