@@ -20,7 +20,7 @@ namespace OnlineRadio.Plugins.Skype
             if (!skype.Client.IsRunning)
                 return;
 
-            initialMood = skype.CurrentUserProfile.RichMoodText;
+            initialMood = skype.CurrentUserProfile.RichMoodText ?? String.Empty;
         }
 
         private void SetSong(string p1, string p2)
