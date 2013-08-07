@@ -20,6 +20,8 @@ namespace OnlineRadio.GUI
             set;
         }
 
+        public Source() { }
+
         public Source(string Name, string Url)
         {
             this.Name = Name;
