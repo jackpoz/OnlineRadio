@@ -207,6 +207,11 @@ namespace OnlineRadio.Core
             Running = false;
             pluginManager.Dispose();
         }
+
+        public void Stop()
+        {
+            Dispose();
+        }
     }
 
     public class SongInfo
