@@ -129,7 +129,10 @@ namespace OnlineRadio.GUI
 
         private void RemoveSourceBtn_Click(object sender, RoutedEventArgs e)
         {
+            if (SelectSourceCombo.SelectedValue == null)
+                return;
 
+            sources.Remove((Source)SelectSourceCombo.SelectedValue);
         }
 
         private void LogMessage(string message)
