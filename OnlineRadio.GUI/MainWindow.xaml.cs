@@ -150,6 +150,7 @@ namespace OnlineRadio.GUI
 
         private void LogMessage(string message)
         {
+            statusBarLabel.Content = message;
         }
     }
 }
