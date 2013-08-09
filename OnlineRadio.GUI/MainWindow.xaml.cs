@@ -124,7 +124,20 @@ namespace OnlineRadio.GUI
 
         private void EditSourceBtn_Click(object sender, RoutedEventArgs e)
         {
+            if (SelectSourceCombo.SelectedValue == null)
+                return;
 
+            Source source = (Source)SelectSourceCombo.SelectedValue;
+            SourceWindow window = new SourceWindow(source);
+            window.Owner = this;
+            window.Title = "Edit source";
+            if (window.ShowDialog() == true)
+            {
+                //replace the Source with the result one from SourceWindow
+                int index = sources.IndexOf(source);
+                sources[index] = window.SourceResult;
+                SelectSourceCombo.SelectedItem = window.SourceResult;
+            }
         }
 
         private void RemoveSourceBtn_Click(object sender, RoutedEventArgs e)
