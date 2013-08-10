@@ -32,12 +32,12 @@ namespace OnlineRadio.Core
             return null;
         }
 
-        public void LoadPlugins(string path)
+        public List<IPlugin> LoadPlugins(string path)
         {
             this.path = path;
             DirectoryInfo dir = new DirectoryInfo(path);
             if (!dir.Exists)
-                return;
+                return plugins;
             Type pluginType = typeof(IPlugin);
             foreach (FileInfo fileInfo in dir.GetFiles("*.dll"))
             {
@@ -60,6 +60,8 @@ namespace OnlineRadio.Core
                     Radio.Log(ex.Message, this);
                 }
             }
+
+            return plugins;
         }
 
         public void UnloadPlugins()

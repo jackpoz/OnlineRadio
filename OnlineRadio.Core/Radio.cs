@@ -66,6 +66,8 @@ namespace OnlineRadio.Core
 
         public event EventHandler<StreamUpdateEventArgs> OnStreamUpdate;
 
+        public event EventHandler<PluginEventArgs> OnPluginsLoaded;
+
         public static event EventHandler<MessageLogEventArgs> OnMessageLogged;
 
         PluginManager pluginManager;
@@ -81,7 +83,9 @@ namespace OnlineRadio.Core
         {
             if (pluginsPath == null)
                 pluginsPath = Directory.GetCurrentDirectory() + "\\plugins";
-            pluginManager.LoadPlugins(pluginsPath);
+            var plugins = pluginManager.LoadPlugins(pluginsPath);
+            if(OnPluginsLoaded != null)
+                OnPluginsLoaded(this, new PluginEventArgs(plugins));
             OnCurrentSongChanged += pluginManager.OnCurrentSongChanged;
             OnStreamUpdate += pluginManager.OnStreamUpdate;
             Running = true;
@@ -206,6 +210,7 @@ namespace OnlineRadio.Core
         {
             Running = false;
             pluginManager.Dispose();
+            OnMessageLogged = null;
         }
 
         public void Stop()
@@ -275,6 +280,16 @@ namespace OnlineRadio.Core
         public MessageLogEventArgs(string Message)
         {
             this.Message = Message;
+        }
+    }
+
+    public class PluginEventArgs : EventArgs
+    {
+        public List<IPlugin> Plugins { get; private set; }
+
+        public PluginEventArgs(List<IPlugin> Plugins)
+        {
+            this.Plugins = Plugins;
         }
     }
 }

@@ -48,6 +48,8 @@ namespace OnlineRadio.GUI
 
         private void Window_Closed(object sender, EventArgs e)
         {
+            StopPlaying();
+
             using (StreamWriter sw = new StreamWriter(sourcesPath))
             {
                 XmlSerializer serializer = new XmlSerializer(typeof(List<Source>));
@@ -90,6 +92,15 @@ namespace OnlineRadio.GUI
                     LogMessage(eventArgs.Message);
                 });
             };
+
+            radio.OnPluginsLoaded += (s, eventArgs) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    AddPluginControls(s, eventArgs);
+                });
+            };
+
             radio.Start();
         }
 
@@ -106,6 +117,7 @@ namespace OnlineRadio.GUI
             Title = windowTitle;
             InfoArtistLbl.Content = String.Empty;
             InfoTitleLbl.Content = String.Empty;
+            PluginsGrid.Children.Clear();
 
             radio.Stop();
             radio = null;
@@ -151,6 +163,17 @@ namespace OnlineRadio.GUI
         private void LogMessage(string message)
         {
             statusBarLabel.Content = message;
+        }
+
+        private void AddPluginControls(object sender, PluginEventArgs e)
+        {
+#warning To Do: add the plugins so that they don't overlap
+            foreach (IPlugin plugin in e.Plugins)
+	        {
+                var visualPlugin = plugin as IVisualPlugin;
+                if (visualPlugin != null)
+                    PluginsGrid.Children.Add(visualPlugin.Control);
+	        }
         }
     }
 }
