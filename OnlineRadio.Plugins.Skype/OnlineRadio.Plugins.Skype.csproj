@@ -46,6 +46,7 @@
     <ProjectReference Include="..\OnlineRadio.Core\OnlineRadio.Core.csproj">
       <Project>{5cbfaa75-d27e-45ce-9063-793ded2225c6}</Project>
       <Name>OnlineRadio.Core</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
