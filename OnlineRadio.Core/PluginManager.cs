@@ -14,24 +14,6 @@ namespace OnlineRadio.Core
 
         string path;
 
-        public PluginManager()
-        {
-            AppDomain.CurrentDomain.AssemblyResolve += CheckLoaded;
-        }
-
-        // Elsewhere in that file...
-        private static Assembly CheckLoaded(object sender, ResolveEventArgs args)
-        {
-            foreach (Assembly a in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                if (a.FullName.Equals(args.Name))
-                {
-                    return a;
-                }
-            }
-            return null;
-        }
-
         public List<IPlugin> LoadPlugins(string path)
         {
             this.path = path;
@@ -43,7 +25,7 @@ namespace OnlineRadio.Core
             {
                 try
                 {
-                    Assembly assembly = Assembly.LoadFile(fileInfo.FullName);
+                    Assembly assembly = Assembly.LoadFrom(fileInfo.FullName);
                     foreach (var type in assembly.GetTypes())
                     {
                         if (!type.IsInterface &&
