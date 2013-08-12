@@ -6,5 +6,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
+        <TextBlock Name="LyricsText" TextWrapping="Wrap" />
     </Grid>
 </UserControl>
