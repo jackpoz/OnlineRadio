@@ -80,8 +80,8 @@ namespace OnlineRadio.GUI
                     string message = eventArgs.NewSong.Artist + " - " + eventArgs.NewSong.Title;
                     LogMessage(message);
                     Title = windowTitle + " - " + message;
-                    InfoArtistLbl.Content = eventArgs.NewSong.Artist;
-                    InfoTitleLbl.Content = eventArgs.NewSong.Title;
+                    InfoArtistTxt.Text = eventArgs.NewSong.Artist;
+                    InfoTitleTxt.Text = eventArgs.NewSong.Title;
                 });
             };
 
@@ -115,8 +115,8 @@ namespace OnlineRadio.GUI
                 return;
 
             Title = windowTitle;
-            InfoArtistLbl.Content = String.Empty;
-            InfoTitleLbl.Content = String.Empty;
+            InfoArtistTxt.Text = String.Empty;
+            InfoTitleTxt.Text = String.Empty;
             PluginsGrid.Children.Clear();
 
             radio.Stop();
@@ -162,7 +162,7 @@ namespace OnlineRadio.GUI
 
         private void LogMessage(string message)
         {
-            statusBarLabel.Content = message;
+            statusBarTxt.Text = message;
         }
 
         private void AddPluginControls(object sender, PluginEventArgs e)

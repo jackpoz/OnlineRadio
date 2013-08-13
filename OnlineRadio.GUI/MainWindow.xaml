@@ -23,18 +23,18 @@
                 </Button>
             </StackPanel>
             <StackPanel Name="InfoPanel">
-                    <StackPanel Orientation="Horizontal">
-                        <Label>Title: </Label>
-                        <Label Name="InfoTitleLbl"></Label>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <Label>Artist: </Label>
-                        <Label Name="InfoArtistLbl"></Label>
-                    </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock xml:space="preserve">Title: </TextBlock>
+                    <TextBlock Name="InfoTitleTxt"/>
                 </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock xml:space="preserve">Artist: </TextBlock>
+                    <TextBlock Name="InfoArtistTxt"/>
+                </StackPanel>
+            </StackPanel>
         </StackPanel>
         <StatusBar Name="statusBar" Height="30" DockPanel.Dock="Bottom">
-            <Label Name="statusBarLabel" Padding="0,0"></Label>
+            <TextBlock Name="statusBarTxt" Padding="0,0"></TextBlock>
         </StatusBar>
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <Grid Name="PluginsGrid">
