@@ -172,7 +172,10 @@ namespace OnlineRadio.GUI
 	        {
                 var visualPlugin = plugin as IVisualPlugin;
                 if (visualPlugin != null)
+                {
                     PluginsGrid.Children.Add(visualPlugin.Control);
+                    Grid.SetColumnSpan(visualPlugin.Control, visualPlugin.ColumnSpan);
+                }
 	        }
         }
     }

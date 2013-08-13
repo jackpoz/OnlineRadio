@@ -37,6 +37,14 @@ namespace OnlineRadio.Plugins.Lyrics
             }
         }
 
+        int IVisualPlugin.ColumnSpan
+        {
+            get
+            {
+                return 2;
+            }
+        }
+
         string IPlugin.Name
         {
             get { return "LyricsPlugin"; }

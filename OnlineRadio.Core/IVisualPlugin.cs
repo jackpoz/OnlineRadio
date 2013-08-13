@@ -10,5 +10,7 @@ namespace OnlineRadio.Core
     public interface IVisualPlugin : IPlugin
     {
         UserControl Control { get; }
+
+        int ColumnSpan { get; }
     }
 }
