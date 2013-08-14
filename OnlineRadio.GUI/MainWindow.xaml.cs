@@ -16,6 +16,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Xml.Serialization;
 using OnlineRadio.Core;
+using System.Drawing;
+using Point = System.Drawing.Point;
 
 namespace OnlineRadio.GUI
 {
@@ -171,16 +173,63 @@ namespace OnlineRadio.GUI
 
         private void AddPluginControls(object sender, PluginEventArgs e)
         {
-#warning To Do: add the plugins so that they don't overlap
+            GridCells cells = new GridCells();
+
             foreach (IPlugin plugin in e.Plugins)
 	        {
                 var visualPlugin = plugin as IVisualPlugin;
                 if (visualPlugin != null)
                 {
+                    Point freeCell = cells.GetFreeCell(visualPlugin.ColumnSpan);
+                    if (freeCell.Y >= PluginsGrid.RowDefinitions.Count)
+                        PluginsGrid.RowDefinitions.Add(new RowDefinition());
                     PluginsGrid.Children.Add(visualPlugin.Control);
                     Grid.SetColumnSpan(visualPlugin.Control, visualPlugin.ColumnSpan);
+                    Grid.SetColumn(visualPlugin.Control, freeCell.X);
+                    Grid.SetRow(visualPlugin.Control, freeCell.Y);
                 }
 	        }
+        }
+
+        class GridCells
+        {
+            Point lastSingleCell;
+            Point lastDoubleCell;
+
+            public GridCells()
+            {
+                lastSingleCell = new Point();
+                lastDoubleCell = new Point();
+            }
+
+            public Point GetFreeCell(int columnSpan)
+            {
+                Point result;
+
+                if (columnSpan == 1)
+                {
+                    result = lastSingleCell;
+                    if (lastSingleCell.X == 0)
+                    {
+                        lastSingleCell.X = 1;
+                        lastDoubleCell.Y += 1;
+                    }
+                    else
+                    {
+                        lastSingleCell.Y = lastDoubleCell.Y;
+                        lastSingleCell.X = 0;
+                    }
+                }
+                else
+                {
+                    result = lastDoubleCell;
+                    lastDoubleCell.Y += 1;
+                    if (lastSingleCell.X == 0)
+                        lastSingleCell.Y += 1;
+                }
+
+                return result;
+            }
         }
     }
 }
