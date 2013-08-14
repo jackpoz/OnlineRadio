@@ -59,7 +59,7 @@ namespace OnlineRadio.Plugins.Lyrics
             set
             {
                 _lyrics = value;
-                Dispatcher.Invoke(() => LyricsText.Text = _lyrics);
+                Dispatcher.InvokeAsync(() => LyricsText.Text = _lyrics);
             }
         }
         string _lyrics;

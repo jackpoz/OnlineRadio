@@ -60,10 +60,10 @@ namespace OnlineRadio.GUI
                 radio.Dispose();
         }
 
-        private void PlaySourceBtn_Click(object sender, RoutedEventArgs e)
+        private async void PlaySourceBtn_Click(object sender, RoutedEventArgs e)
         {
             //stop playing any current radio
-            StopPlaying();
+            await StopPlaying();
 
             if (SelectSourceCombo.SelectedValue == null)
             {
@@ -71,11 +71,13 @@ namespace OnlineRadio.GUI
                 return;
             }
 
+            LogMessage("Starting playing...");
+
             Source source = (Source)SelectSourceCombo.SelectedValue;
             radio = new Radio(source.Url);
             radio.OnCurrentSongChanged += (s, eventArgs) =>
             {
-                Dispatcher.Invoke(() =>
+                Dispatcher.InvokeAsync(() =>
                 {
                     string message = eventArgs.NewSong.Artist + " - " + eventArgs.NewSong.Title;
                     LogMessage(message);
@@ -87,7 +89,7 @@ namespace OnlineRadio.GUI
 
             Radio.OnMessageLogged += (s, eventArgs) =>
             {
-                Dispatcher.Invoke(() =>
+                Dispatcher.InvokeAsync(() =>
                 {
                     LogMessage(eventArgs.Message);
                 });
@@ -95,7 +97,7 @@ namespace OnlineRadio.GUI
 
             radio.OnPluginsLoaded += (s, eventArgs) =>
             {
-                Dispatcher.Invoke(() =>
+                Dispatcher.InvokeAsync(() =>
                 {
                     AddPluginControls(s, eventArgs);
                 });
@@ -104,12 +106,12 @@ namespace OnlineRadio.GUI
             radio.Start();
         }
 
-        private void StopSourceBtn_Click(object sender, RoutedEventArgs e)
+        private async void StopSourceBtn_Click(object sender, RoutedEventArgs e)
         {
-            StopPlaying();
+            await StopPlaying();
         }
 
-        private void StopPlaying()
+        private async Task StopPlaying()
         {
             if (radio == null)
                 return;
@@ -119,7 +121,9 @@ namespace OnlineRadio.GUI
             InfoTitleTxt.Text = String.Empty;
             PluginsGrid.Children.Clear();
 
-            radio.Stop();
+            LogMessage("Stopping playing...");
+            await Task.Run(() => radio.Stop());
+            LogMessage("Playing stopped");
             radio = null;
         }
 
