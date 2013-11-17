@@ -50,16 +50,14 @@ namespace OnlineRadio.GUI
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            StopPlaying();
+            if(radio != null)
+                radio.Dispose();
 
             using (StreamWriter sw = new StreamWriter(sourcesPath))
             {
                 XmlSerializer serializer = new XmlSerializer(typeof(List<Source>));
                 serializer.Serialize(sw, sources.ToList());
             }
-
-            if (radio != null)
-                radio.Dispose();
         }
 
         private async void PlaySourceBtn_Click(object sender, RoutedEventArgs e)
