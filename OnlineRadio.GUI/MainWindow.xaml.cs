@@ -46,6 +46,11 @@ namespace OnlineRadio.GUI
             }
 
             SelectSourceCombo.ItemsSource = sources;
+            var selectedSource = (from source in sources
+                                  where source.Selected
+                                  select source).FirstOrDefault();
+            if (selectedSource != null)
+                SelectSourceCombo.SelectedValue = selectedSource;
         }
 
         private void Window_Closed(object sender, EventArgs e)
@@ -73,7 +78,11 @@ namespace OnlineRadio.GUI
 
             LogMessage("Starting playing...");
 
+            foreach (Source sourceChoice in SelectSourceCombo.Items)
+                sourceChoice.Selected = false;
+
             Source source = (Source)SelectSourceCombo.SelectedValue;
+            source.Selected = true;
             radio = new Radio(source.Url);
             radio.OnCurrentSongChanged += (s, eventArgs) =>
             {

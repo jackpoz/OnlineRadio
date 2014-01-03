@@ -20,6 +20,12 @@ namespace OnlineRadio.GUI
             set;
         }
 
+        public bool Selected
+        {
+            get;
+            set;
+        }
+
         public Source() { }
 
         public Source(string Name, string Url)
