@@ -67,6 +67,16 @@ namespace OnlineRadio.GUI
 
         private async void PlaySourceBtn_Click(object sender, RoutedEventArgs e)
         {
+            await PlaySource();
+        }
+
+        private async void PlaySourceBtn_Click(object sender, EventArgs e)
+        {
+            await PlaySource();
+        }
+
+        private async Task PlaySource()
+        {
             //stop playing any current radio
             await StopPlaying();
 
@@ -116,6 +126,11 @@ namespace OnlineRadio.GUI
         }
 
         private async void StopSourceBtn_Click(object sender, RoutedEventArgs e)
+        {
+            await StopPlaying();
+        }
+
+        private async void StopSourceBtn_Click(object sender, EventArgs e)
         {
             await StopPlaying();
         }
