@@ -15,6 +15,7 @@ namespace OnlineRadio.Plugins.Skype
 
         public SkypePlugin()
         {
+            initialMood = "";
             SKYPE4COMLib.Skype skype = new SKYPE4COMLib.Skype();
 
             if (!skype.Client.IsRunning)
