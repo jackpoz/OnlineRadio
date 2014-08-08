@@ -7,6 +7,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace OnlineRadio.Core
 {
@@ -206,8 +207,13 @@ namespace OnlineRadio.Core
                 OnMessageLogged(sender, new MessageLogEventArgs(Log));
         }
 
+        IntPtr _disposed = IntPtr.Zero;
         public void Dispose()
         {
+            // Thread-safe single disposal
+            if (Interlocked.Exchange(ref _disposed, (IntPtr)1) != IntPtr.Zero)
+                return;
+
             Running = false;
             pluginManager.Dispose();
             OnMessageLogged = null;
