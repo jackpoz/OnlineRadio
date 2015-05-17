@@ -189,7 +189,7 @@ namespace OnlineRadio.Plugins.Audio
             if (_length < count)
                 count = _length;
 
-            if (blocks.Count == 0)
+            if (blocks.Count == 0 && (currentBlock == null || currentBlock.Length == 0))
                 return 0;
 
             int readCount = 0;
