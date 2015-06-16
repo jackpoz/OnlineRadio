@@ -72,15 +72,7 @@ namespace OnlineRadio.Plugins.Audio
                     }
                     else
                     {
-                        Mp3Frame frame = null;
-                        try
-                        {
-                            frame = Mp3Frame.LoadFromStream(stream);
-                        }
-                        catch (EndOfStreamException)
-                        {
-                            break;
-                        }
+                        Mp3Frame frame = Mp3Frame.LoadFromStream(stream);
                         if (frame == null)
                             continue;
                         if (decompressor == null)
@@ -107,6 +99,10 @@ namespace OnlineRadio.Plugins.Audio
 
                 } while (IsPlaying);
             }
+            catch (EndOfStreamException)
+            { }
+            catch (NAudio.MmException)
+            { }
             finally
             {
                 if (waveOut != null)
