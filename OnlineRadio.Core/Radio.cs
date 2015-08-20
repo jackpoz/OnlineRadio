@@ -113,6 +113,7 @@ namespace OnlineRadio.Core
                             int bufferPosition = 0;
                             int readBytes = 0;
                             StringBuilder metadataSb = new StringBuilder();
+                            socketStream.ReadTimeout = 10 * 1000;
 
                             while (Running)
                             {
