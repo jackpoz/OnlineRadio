@@ -67,6 +67,8 @@ namespace OnlineRadio.Core
 
         public event EventHandler<StreamUpdateEventArgs> OnStreamUpdate;
 
+        public event EventHandler<StreamOverEventArgs> OnStreamOver;
+
         public event EventHandler<PluginEventArgs> OnPluginsLoaded;
 
         public static event EventHandler<MessageLogEventArgs> OnMessageLogged;
@@ -89,6 +91,7 @@ namespace OnlineRadio.Core
                 OnPluginsLoaded(this, new PluginEventArgs(plugins));
             OnCurrentSongChanged += pluginManager.OnCurrentSongChanged;
             OnStreamUpdate += pluginManager.OnStreamUpdate;
+            OnStreamOver += pluginManager.OnStreamOver;
             Running = true;
             runningTask = Task.Run(() => GetHttpStream());
         }
@@ -101,6 +104,8 @@ namespace OnlineRadio.Core
                 {
                     HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url);
                     request.Headers.Add("icy-metadata", "1");
+                    request.ReadWriteTimeout = 10 * 1000;
+                    request.Timeout = 10 * 1000;
                     using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
                     {
                         //get the position of metadata
@@ -113,7 +118,6 @@ namespace OnlineRadio.Core
                             int bufferPosition = 0;
                             int readBytes = 0;
                             StringBuilder metadataSb = new StringBuilder();
-                            socketStream.ReadTimeout = 10 * 1000;
 
                             while (Running)
                             {
@@ -169,14 +173,17 @@ namespace OnlineRadio.Core
                 catch (IOException ex)
                 {
                     Radio.Log(string.Format("Handled IOException, reconnecting. Details:\n{0}\n{1}", ex.Message, ex.StackTrace), this);
+                    OnStreamOver?.Invoke(this, new StreamOverEventArgs());
                 }
                 catch (SocketException ex)
                 {
                     Radio.Log(string.Format("Handled SocketException, reconnecting. Details:\n{0}\n{1}", ex.Message, ex.StackTrace), this);
+                    OnStreamOver?.Invoke(this, new StreamOverEventArgs());
                 }
                 catch (WebException ex)
                 {
                     Radio.Log(string.Format("Handled WebException, reconnecting. Details:\n{0}\n{1}", ex.Message, ex.StackTrace), this);
+                    OnStreamOver?.Invoke(this, new StreamOverEventArgs());
                 }
             } while (Running);
         }
@@ -216,7 +223,11 @@ namespace OnlineRadio.Core
                 return;
 
             Running = false;
+            OnCurrentSongChanged -= pluginManager.OnCurrentSongChanged;
+            OnStreamUpdate -= pluginManager.OnStreamUpdate;
+            OnStreamOver -= pluginManager.OnStreamOver;
             pluginManager.Dispose();
+            pluginManager = null;
             OnMessageLogged = null;
         }
 
@@ -277,6 +288,13 @@ namespace OnlineRadio.Core
         public StreamUpdateEventArgs(byte[] Data)
         {
             this.Data = Data;
+        }
+    }
+
+    public class StreamOverEventArgs : EventArgs
+    {
+        public StreamOverEventArgs()
+        {
         }
     }
 

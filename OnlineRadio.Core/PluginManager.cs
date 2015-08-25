@@ -79,5 +79,11 @@ namespace OnlineRadio.Core
             foreach (var plugin in plugins)
                 plugin.OnStreamUpdate(sender, args);
         }
+
+        public void OnStreamOver(object sender, StreamOverEventArgs args)
+        {
+            foreach (var plugin in plugins)
+                plugin.OnStreamOver(sender, args);
+        }
     }
 }

@@ -62,5 +62,8 @@ namespace OnlineRadio.Plugins.Skype
 
         public void OnStreamUpdate(object sender, StreamUpdateEventArgs args)
         { }
+
+        public void OnStreamOver(object sender, StreamOverEventArgs args)
+        { }
     }
 }

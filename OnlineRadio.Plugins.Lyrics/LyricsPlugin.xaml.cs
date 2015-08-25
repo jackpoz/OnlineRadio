@@ -106,6 +106,9 @@ namespace OnlineRadio.Plugins.Lyrics
         {
         }
 
+        public void OnStreamOver(object sender, StreamOverEventArgs args)
+        { }
+
         public LyricsPlugin()
         {
             InitializeComponent();

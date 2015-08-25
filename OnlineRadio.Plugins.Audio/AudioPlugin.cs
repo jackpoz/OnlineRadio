@@ -38,37 +38,40 @@ namespace OnlineRadio.Plugins.Audio
                 StartPlay();
         }
 
+        public void OnStreamOver(object sender, StreamOverEventArgs args)
+        {
+            stream.Flush();
+        }
+
         void StartPlay()
         {
             IsPlaying = true;
-            playTask = Task.Factory.StartNew(() => DecompressFrames());
+            playTask = Task.Factory.StartNew(DecompressFrames);
         }
 
         #region NAudio
         SlidingStream stream;
+        IWavePlayer waveOut;
+        IMp3FrameDecompressor decompressor;
+        BufferedWaveProvider bufferedWaveProvider;
 
-        private void DecompressFrames()
+        private async Task DecompressFrames()
         {
-            IMp3FrameDecompressor decompressor = null;
-            IWavePlayer waveOut = null;
-            try
-            {
-                BufferedWaveProvider bufferedWaveProvider = null;
-                VolumeWaveProvider16 volumeProvider = null;
-                byte[] buffer = new byte[16384 * 4]; // needs to be big enough to hold a decompressed frame
-                bool firstLoop = true;
+            byte[] buffer = new byte[16384 * 4]; // needs to be big enough to hold a decompressed frame
 
-                do
+            do
+            {
+                try
                 {
                     //WaveBuffer getting full, taking a break
                     if (bufferedWaveProvider != null && bufferedWaveProvider.BufferLength - bufferedWaveProvider.BufferedBytes < bufferedWaveProvider.WaveFormat.AverageBytesPerSecond / 4)
                     {
-                        Thread.Sleep(500);
+                        await Task.Delay(500);
                     }
                     //StreamBuffer empty, taking a break
                     else if (stream.Length < 16384 * 2)
                     {
-                        Thread.Sleep(500);
+                        await Task.Delay(500);
                     }
                     else
                     {
@@ -82,44 +85,52 @@ namespace OnlineRadio.Plugins.Audio
                             bufferedWaveProvider = new BufferedWaveProvider(decompressor.OutputFormat);
                             bufferedWaveProvider.BufferDuration = TimeSpan.FromSeconds(5); // allow us to get well ahead of ourselves
                         }
-                        int decompressed = decompressor.DecompressFrame(frame, buffer, 0);
-                        if (decompressed > 0)
-                            bufferedWaveProvider.AddSamples(buffer, 0, decompressed);
 
-                        if (firstLoop)
+                        try
                         {
-                            firstLoop = false;
-                            waveOut = CreateWaveOut();
-                            volumeProvider = new VolumeWaveProvider16(bufferedWaveProvider);
+                            int decompressed = decompressor.DecompressFrame(frame, buffer, 0);
+                            if (decompressed > 0)
+                                bufferedWaveProvider.AddSamples(buffer, 0, decompressed);
+                        }
+                        catch (NAudio.MmException)
+                        { }
+
+                        if (waveOut == null)
+                        {
+                            waveOut = new WaveOut();
+                            VolumeWaveProvider16 volumeProvider = new VolumeWaveProvider16(bufferedWaveProvider);
                             volumeProvider.Volume = 0.5f;
                             waveOut.Init(volumeProvider);
                             waveOut.Play();
                         }
                     }
+                }
+                catch (EndOfStreamException)
+                {
+                    CleanUpAudio();
+                }
+            } while (IsPlaying);
 
-                } while (IsPlaying);
-            }
-            catch (EndOfStreamException)
-            { }
-            catch (NAudio.MmException)
-            { }
-            finally
-            {
-                if (waveOut != null)
-                {
-                    waveOut.Stop();
-                    waveOut.Dispose();
-                }
-                if (decompressor != null)
-                {
-                    decompressor.Dispose();
-                }
-            }
+            CleanUpAudio();
         }
 
-        private IWavePlayer CreateWaveOut()
+        private void CleanUpAudio()
         {
-            return new WaveOut();
+            if (waveOut != null)
+            {
+                waveOut.Stop();
+                waveOut.Dispose();
+                waveOut = null;
+            }
+
+            if (decompressor != null)
+            {
+                decompressor.Dispose();
+                decompressor = null;
+            }
+
+            bufferedWaveProvider = null;
+            stream.Flush();
         }
         #endregion
 
@@ -151,7 +162,9 @@ namespace OnlineRadio.Plugins.Audio
 
         public override void Flush()
         {
-            throw new NotImplementedException();
+            _length = 0;
+            blocks.Clear();
+            currentBlock = null;
         }
 
         public override long Length

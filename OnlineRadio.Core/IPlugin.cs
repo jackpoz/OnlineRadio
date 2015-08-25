@@ -15,6 +15,8 @@ namespace OnlineRadio.Core
         void OnCurrentSongChanged(object sender, CurrentSongEventArgs args);
 
         void OnStreamUpdate(object sender, StreamUpdateEventArgs args);
+
+        void OnStreamOver(object sender, StreamOverEventArgs args);
     }
 
     public abstract class BasePlugin : IPlugin
@@ -31,6 +33,9 @@ namespace OnlineRadio.Core
         {}
 
         public void OnStreamUpdate(object sender, StreamUpdateEventArgs args)
+        { }
+
+        public void OnStreamOver(object sender, StreamOverEventArgs args)
         { }
     }
 }
