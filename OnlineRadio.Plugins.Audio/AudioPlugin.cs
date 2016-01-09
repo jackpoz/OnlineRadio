@@ -7,6 +7,7 @@ using System.IO;
 using NAudio.Wave;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace OnlineRadio.Plugins.Audio
 {
@@ -163,7 +164,7 @@ namespace OnlineRadio.Plugins.Audio
         public override void Flush()
         {
             _length = 0;
-            blocks.Clear();
+            blocks = new ConcurrentQueue<byte[]>();
             currentBlock = null;
         }
 
@@ -171,7 +172,7 @@ namespace OnlineRadio.Plugins.Audio
         {
             get { return _length; }
         }
-        int _length;
+        volatile int _length;
 
         public override long Position
         {
@@ -185,12 +186,12 @@ namespace OnlineRadio.Plugins.Audio
             }
         }
 
-        Queue<byte[]> blocks;
+        ConcurrentQueue<byte[]> blocks;
         byte[] currentBlock;
 
         public SlidingStream()
         {
-            blocks = new Queue<byte[]>();
+            blocks = new ConcurrentQueue<byte[]>();
         }
 
         public override int Read(byte[] buffer, int offset, int count)
@@ -203,7 +204,8 @@ namespace OnlineRadio.Plugins.Audio
 
             int readCount = 0;
             if (currentBlock == null || currentBlock.Length == 0)
-                currentBlock = blocks.Dequeue();
+                if (!blocks.TryDequeue(out currentBlock))
+                    throw new InvalidOperationException("Failed to dequeue from SlidingStream");
 
             while (readCount < count)
             {
@@ -211,7 +213,8 @@ namespace OnlineRadio.Plugins.Audio
                 {
                     Buffer.BlockCopy(currentBlock, 0, buffer, offset + readCount, currentBlock.Length);
                     readCount += currentBlock.Length;
-                    currentBlock = blocks.Dequeue();
+                    if (!blocks.TryDequeue(out currentBlock))
+                        throw new InvalidOperationException("Failed to dequeue from SlidingStream with half-read buffer");
                     continue;
                 }
                 else
