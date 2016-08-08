@@ -109,7 +109,9 @@ namespace OnlineRadio.Core
                     using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
                     {
                         //get the position of metadata
-                        int metaInt = Convert.ToInt32(response.GetResponseHeader("icy-metaint"));
+                        int metaInt = 0;
+                        if (!string.IsNullOrEmpty(response.GetResponseHeader("icy-metaint")))
+                            metaInt = Convert.ToInt32(response.GetResponseHeader("icy-metaint"));
                         using (Stream socketStream = response.GetResponseStream())
                         {
                             byte[] buffer = new byte[16384];
@@ -134,7 +136,7 @@ namespace OnlineRadio.Core
 
                                 if (metadataLength == 0)
                                 {
-                                    if (streamPosition + readBytes - bufferPosition <= metaInt)
+                                    if (metaInt == 0 || streamPosition + readBytes - bufferPosition <= metaInt)
                                     {
                                         streamPosition += readBytes - bufferPosition;
                                         ProcessStreamData(buffer, ref bufferPosition, readBytes - bufferPosition);
