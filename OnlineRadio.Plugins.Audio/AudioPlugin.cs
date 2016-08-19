@@ -41,7 +41,9 @@ namespace OnlineRadio.Plugins.Audio
 
         public void OnStreamOver(object sender, StreamOverEventArgs args)
         {
-            stream.Flush();
+            IsPlaying = false;
+            playTask.Wait();
+            StartPlay();
         }
 
         void StartPlay()
@@ -65,7 +67,7 @@ namespace OnlineRadio.Plugins.Audio
                 try
                 {
                     //WaveBuffer getting full, taking a break
-                    if (bufferedWaveProvider != null && bufferedWaveProvider.BufferLength - bufferedWaveProvider.BufferedBytes < bufferedWaveProvider.WaveFormat.AverageBytesPerSecond / 4)
+                    if (bufferedWaveProvider != null && bufferedWaveProvider.BufferLength - bufferedWaveProvider.BufferedBytes < bufferedWaveProvider.WaveFormat.AverageBytesPerSecond / 2)
                     {
                         await Task.Delay(500);
                     }
@@ -228,7 +230,7 @@ namespace OnlineRadio.Plugins.Audio
                 }
             }
 
-            _length -= readCount;
+            Interlocked.Add(ref _length, -readCount);
 
             return readCount;
         }
@@ -248,7 +250,7 @@ namespace OnlineRadio.Plugins.Audio
             byte[] bufferCopy = new byte[count];
             Buffer.BlockCopy(buffer, offset, bufferCopy, 0, count);
             blocks.Enqueue(bufferCopy);
-            _length += count;
+            Interlocked.Add(ref _length, count);
         }
     }
 }
