@@ -42,7 +42,7 @@ namespace OnlineRadio.Plugins.Audio
         public void OnStreamOver(object sender, StreamOverEventArgs args)
         {
             IsPlaying = false;
-            playTask.Wait();
+            playTask?.Wait();
             StartPlay();
         }
 
