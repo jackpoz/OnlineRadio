@@ -49,7 +49,7 @@ namespace OnlineRadio.Plugins.Audio
         void StartPlay()
         {
             IsPlaying = true;
-            playTask = Task.Factory.StartNew(DecompressFrames);
+            playTask = Task.Run(DecompressFrames);
         }
 
         #region NAudio

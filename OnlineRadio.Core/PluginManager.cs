@@ -71,7 +71,7 @@ namespace OnlineRadio.Core
         public void OnCurrentSongChanged(object sender, CurrentSongEventArgs args)
         {
             foreach (var plugin in plugins)
-                Task.Factory.StartNew(()=>plugin.OnCurrentSongChanged(sender, args));
+                Task.Run(()=>plugin.OnCurrentSongChanged(sender, args));
         }
 
         public void OnStreamUpdate(object sender, StreamUpdateEventArgs args)
