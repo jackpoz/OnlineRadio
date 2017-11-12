@@ -190,7 +190,7 @@ namespace OnlineRadio.GUI
 
         private void LogMessage(string message)
         {
-            statusBarTxt.Text = message;
+            statusBarTxt.Text = message?.Replace(Environment.NewLine, " ").Replace("\n"," ");
         }
 
         private void AddPluginControls(object sender, PluginEventArgs e)
