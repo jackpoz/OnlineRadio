@@ -192,7 +192,7 @@ namespace OnlineRadio.Core
 
         void UpdateCurrentSong(object sender, MetadataEventArgs args)
         {
-            const string metadataSongPattern = @"StreamTitle='(?<artist>.+?) - (?<title>.+?)';";
+            const string metadataSongPattern = @"StreamTitle='(?<title>.+?) - (?<artist>.+?)';";
             Match match = Regex.Match(args.NewMetadata, metadataSongPattern);
             if (match.Success)
                 CurrentSong = new SongInfo(match.Groups["artist"].Value, match.Groups["title"].Value);
