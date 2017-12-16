@@ -8,11 +8,18 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Threading;
+using System.Collections.ObjectModel;
 
 namespace OnlineRadio.Core
 {
     public class Radio : IDisposable
     {
+        static readonly ReadOnlyCollection<string> metadataSongPatterns = new ReadOnlyCollection<string>(new string[]
+        {
+            @"StreamTitle='(?<title>.+?) - (?<artist>.+?)';",
+            @"StreamTitle='(?<title>.+?)~(?<artist>.+?)~"
+        });
+
         public string Url
         {
             get;
@@ -192,10 +199,15 @@ namespace OnlineRadio.Core
 
         void UpdateCurrentSong(object sender, MetadataEventArgs args)
         {
-            const string metadataSongPattern = @"StreamTitle='(?<title>.+?) - (?<artist>.+?)';";
-            Match match = Regex.Match(args.NewMetadata, metadataSongPattern);
-            if (match.Success)
-                CurrentSong = new SongInfo(match.Groups["artist"].Value, match.Groups["title"].Value);
+            foreach (var metadataSongPattern in metadataSongPatterns)
+            {
+                Match match = Regex.Match(args.NewMetadata, metadataSongPattern);
+                if (match.Success)
+                {
+                    CurrentSong = new SongInfo(match.Groups["artist"].Value.Trim(), match.Groups["title"].Value.Trim());
+                    return;
+                }
+            }
         }
 
         void ProcessStreamData(byte[] buffer, ref int offset, int length)
