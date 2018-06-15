@@ -11,7 +11,7 @@ using System.Collections.Concurrent;
 
 namespace OnlineRadio.Plugins.Audio
 {
-    public class AudioPlugin : IPlugin, IDisposable
+    public sealed class AudioPlugin : IPlugin, IDisposable
     {
         public string Name
         {
@@ -30,7 +30,9 @@ namespace OnlineRadio.Plugins.Audio
         }
 
         public void OnCurrentSongChanged(object sender, CurrentSongEventArgs args)
-        {}
+        {
+            // Do nothing
+        }
 
         public void OnStreamUpdate(object sender, StreamUpdateEventArgs args)
         {
@@ -53,7 +55,7 @@ namespace OnlineRadio.Plugins.Audio
         }
 
         #region NAudio
-        SlidingStream stream;
+        readonly SlidingStream stream;
         IWavePlayer waveOut;
         IMp3FrameDecompressor decompressor;
         BufferedWaveProvider bufferedWaveProvider;
@@ -96,7 +98,9 @@ namespace OnlineRadio.Plugins.Audio
                                 bufferedWaveProvider.AddSamples(buffer, 0, decompressed);
                         }
                         catch (NAudio.MmException)
-                        { }
+                        {
+                            // Just ignore the frame if a MmException occurs
+                        }
 
                         if (waveOut == null)
                         {
@@ -217,7 +221,6 @@ namespace OnlineRadio.Plugins.Audio
                     readCount += currentBlock.Length;
                     if (!blocks.TryDequeue(out currentBlock))
                         throw new InvalidOperationException("Failed to dequeue from SlidingStream with half-read buffer");
-                    continue;
                 }
                 else
                 {

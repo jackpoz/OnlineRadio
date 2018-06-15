@@ -30,12 +30,18 @@ namespace OnlineRadio.Core
         }
 
         public void OnCurrentSongChanged(object sender, CurrentSongEventArgs args)
-        {}
+        {
+            // Do nothing
+        }
 
         public void OnStreamUpdate(object sender, StreamUpdateEventArgs args)
-        { }
+        {
+            // Do nothing
+        }
 
         public void OnStreamOver(object sender, StreamOverEventArgs args)
-        { }
+        {
+            // Do nothing
+        }
     }
 }

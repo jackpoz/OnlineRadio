@@ -52,10 +52,6 @@ namespace OnlineRadio.Plugins.Lyrics
 
         string Lyrics
         {
-            get
-            {
-                return _lyrics;
-            }
             set
             {
                 _lyrics = value;
@@ -104,10 +100,13 @@ namespace OnlineRadio.Plugins.Lyrics
 
         public void OnStreamUpdate(object sender, StreamUpdateEventArgs args)
         {
+            // Do nothing
         }
 
         public void OnStreamOver(object sender, StreamOverEventArgs args)
-        { }
+        {
+            // Do nothing
+        }
 
         public LyricsPlugin()
         {

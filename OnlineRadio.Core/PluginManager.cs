@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace OnlineRadio.Core
 {
-    class PluginManager : IDisposable
+    sealed class PluginManager : IDisposable
     {
-        List<IPlugin> plugins = new List<IPlugin>();
+        readonly List<IPlugin> plugins = new List<IPlugin>();
 
         string path;
 
