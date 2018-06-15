@@ -50,15 +50,10 @@ namespace OnlineRadio.Plugins.Lyrics
             get { return "LyricsPlugin"; }
         }
 
-        string Lyrics
+        void SetLyrics(string lyrics)
         {
-            set
-            {
-                _lyrics = value;
-                Dispatcher.InvokeAsync(() => LyricsText.Text = _lyrics);
-            }
+            Dispatcher.InvokeAsync(() => LyricsText.Text = lyrics);
         }
-        string _lyrics;
 
         string ApiKey
         {
@@ -86,14 +81,14 @@ namespace OnlineRadio.Plugins.Lyrics
                     StreamReader responseStream = new StreamReader(response.GetResponseStream(), encode);
                     JObject json = JObject.Parse(responseStream.ReadToEnd());
                     if ((string)json["message"]["header"]["status_code"] == "401")
-                        Lyrics = "Unathorized call to Lyrics API, please check \"apikey\" parameter in the plugin config file."
-                                + "Current value: \"" + ApiKey + "\"";
+                        SetLyrics("Unathorized call to Lyrics API, please check \"apikey\" parameter in the plugin config file."
+                                + "Current value: \"" + ApiKey + "\"");
                     else
-                        Lyrics = (string)json["message"]["body"]["lyrics"]["lyrics_body"];
+                        SetLyrics((string)json["message"]["body"]["lyrics"]["lyrics_body"]);
                 }
                 catch(ArgumentException)
                 {
-                    Lyrics = "Lyrics not found";
+                    SetLyrics("Lyrics not found");
                 }
             });
         }
