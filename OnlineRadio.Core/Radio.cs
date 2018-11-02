@@ -48,8 +48,7 @@ namespace OnlineRadio.Core
             }
             private set
             {
-                if (OnMetadataChanged != null)
-                    OnMetadataChanged(this, new MetadataEventArgs(_metadata, value));
+                OnMetadataChanged?.Invoke(this, new MetadataEventArgs(_metadata, value));
                 _metadata = value;
             }
         }
@@ -64,8 +63,7 @@ namespace OnlineRadio.Core
             }
             private set
             {
-                if (OnCurrentSongChanged != null)
-                    OnCurrentSongChanged(this, new CurrentSongEventArgs(_currentSong, value));
+                OnCurrentSongChanged?.Invoke(this, new CurrentSongEventArgs(_currentSong, value));
                 _currentSong = value;
             }
         }
@@ -94,8 +92,7 @@ namespace OnlineRadio.Core
             if (pluginsPath == null)
                 pluginsPath = Directory.GetCurrentDirectory() + "\\plugins";
             var plugins = pluginManager.LoadPlugins(pluginsPath);
-            if(OnPluginsLoaded != null)
-                OnPluginsLoaded(this, new PluginEventArgs(plugins));
+            OnPluginsLoaded?.Invoke(this, new PluginEventArgs(plugins));
             OnCurrentSongChanged += pluginManager.OnCurrentSongChanged;
             OnStreamUpdate += pluginManager.OnStreamUpdate;
             OnStreamOver += pluginManager.OnStreamOver;
@@ -225,8 +222,7 @@ namespace OnlineRadio.Core
 
         public static void Log(string Log, object sender)
         {
-            if (OnMessageLogged != null)
-                OnMessageLogged(sender, new MessageLogEventArgs(Log));
+            OnMessageLogged?.Invoke(sender, new MessageLogEventArgs(Log));
         }
 
         IntPtr _disposed = IntPtr.Zero;
