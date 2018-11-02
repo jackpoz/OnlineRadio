@@ -25,6 +25,11 @@ namespace OnlineRadio.Core
             get;
             private set;
         }
+        public bool ArtistTitleOrderInverted
+        {
+            get;
+            private set;
+        }
         public bool Running
         {
             get
@@ -80,9 +85,10 @@ namespace OnlineRadio.Core
 
         PluginManager pluginManager;
 
-        public Radio(string Url)
+        public Radio(string Url, bool ArtistTitleOrderInverted)
         {
             this.Url = Url;
+            this.ArtistTitleOrderInverted = ArtistTitleOrderInverted;
             OnMetadataChanged += UpdateCurrentSong;
             pluginManager = new PluginManager();
         }
@@ -203,7 +209,12 @@ namespace OnlineRadio.Core
                 Match match = Regex.Match(args.NewMetadata, metadataSongPattern);
                 if (match.Success)
                 {
-                    CurrentSong = new SongInfo(match.Groups["artist"].Value.Trim(), match.Groups["title"].Value.Trim());
+                    string artist = match.Groups["artist"].Value.Trim();
+                    string title = match.Groups["title"].Value.Trim();
+                    if (ArtistTitleOrderInverted)
+                        CurrentSong = new SongInfo(title, artist);
+                    else
+                        CurrentSong = new SongInfo(artist, title);                
                     return;
                 }
             }

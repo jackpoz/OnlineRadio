@@ -29,6 +29,7 @@ namespace OnlineRadio.GUI
         {
             NameBox.Text = SourceInput.Name;
             UrlBox.Text = SourceInput.Url;
+            ArtistTitleOrderInvertedBox.IsChecked = SourceInput.ArtistTitleOrderInverted;
         }
 
         public SourceWindow()
@@ -38,7 +39,7 @@ namespace OnlineRadio.GUI
 
         private void OkBtn_Click(object sender, RoutedEventArgs e)
         {
-            SourceResult = new Source(NameBox.Text, UrlBox.Text);
+            SourceResult = new Source(NameBox.Text, UrlBox.Text, ArtistTitleOrderInvertedBox.IsChecked ?? false);
             DialogResult = true;
         }
 

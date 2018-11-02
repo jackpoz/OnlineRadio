@@ -93,7 +93,7 @@ namespace OnlineRadio.GUI
 
             Source source = (Source)SelectSourceCombo.SelectedValue;
             source.Selected = true;
-            radio = new Radio(source.Url);
+            radio = new Radio(source.Url, source.ArtistTitleOrderInverted);
             radio.OnCurrentSongChanged += (s, eventArgs) =>
             {
                 Dispatcher.InvokeAsync(() =>

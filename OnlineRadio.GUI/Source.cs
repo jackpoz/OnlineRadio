@@ -20,6 +20,12 @@ namespace OnlineRadio.GUI
             set;
         }
 
+        public bool ArtistTitleOrderInverted
+        {
+            get;
+            set;
+        }
+
         public bool Selected
         {
             get;
@@ -28,10 +34,11 @@ namespace OnlineRadio.GUI
 
         public Source() { }
 
-        public Source(string Name, string Url)
+        public Source(string Name, string Url, bool ArtistTitleOrderInverted)
         {
             this.Name = Name;
             this.Url = Url;
+            this.ArtistTitleOrderInverted = ArtistTitleOrderInverted;
         }
 
         public override string ToString()

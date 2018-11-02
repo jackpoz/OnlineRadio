@@ -15,7 +15,7 @@ namespace OnlineRadio.CommandLine
                 switch (args[0])
                 {
                     case "-url":
-                        using (Radio radio = new Radio(args[1]))
+                        using (Radio radio = new Radio(args[1], false))
                         {
                             radio.OnCurrentSongChanged += (sender, eventArgs) =>
                                 {
