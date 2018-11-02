@@ -116,14 +116,15 @@ namespace OnlineRadio.Core
                         int metaInt = 0;
                         if (!string.IsNullOrEmpty(response.GetResponseHeader("icy-metaint")))
                             metaInt = Convert.ToInt32(response.GetResponseHeader("icy-metaint"));
+
                         using (Stream socketStream = response.GetResponseStream())
+                        using (MemoryStream metadataData = new MemoryStream())
                         {
                             byte[] buffer = new byte[16384];
                             int metadataLength = 0;
                             int streamPosition = 0;
                             int bufferPosition = 0;
                             int readBytes = 0;
-                            StringBuilder metadataSb = new StringBuilder();
 
                             while (Running)
                             {
@@ -161,12 +162,13 @@ namespace OnlineRadio.Core
                                 //get the metadata and reset the position
                                 while (bufferPosition < readBytes)
                                 {
-                                    metadataSb.Append(Convert.ToChar(buffer[bufferPosition++]));
+                                    metadataData.WriteByte(buffer[bufferPosition++]);
                                     metadataLength--;
                                     if (metadataLength == 0)
                                     {
-                                        Metadata = metadataSb.ToString();
-                                        metadataSb.Clear();
+                                        var metadataBuffer = metadataData.ToArray();
+                                        Metadata = Encoding.UTF8.GetString(metadataBuffer);
+                                        metadataData.SetLength(0);
                                         streamPosition = Math.Min(readBytes - bufferPosition, metaInt);
                                         ProcessStreamData(buffer, ref bufferPosition, streamPosition);
                                         break;
