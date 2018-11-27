@@ -5,10 +5,11 @@ using NAudio.Wave;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
+using System.Windows.Controls;
 
 namespace OnlineRadio.Plugins.Audio
 {
-    public sealed class AudioPlugin : IPlugin, IDisposable
+    public sealed class AudioPlugin : IButtonPlugin, IPlugin, IDisposable
     {
         public string Name
         {
@@ -20,6 +21,15 @@ namespace OnlineRadio.Plugins.Audio
             get;
             set;
         }
+
+        public UserControl Button
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         Task playTask;
 
         string Codec
