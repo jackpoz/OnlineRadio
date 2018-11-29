@@ -162,6 +162,7 @@ namespace OnlineRadio.GUI
             InfoArtistTxt.Text = String.Empty;
             InfoTitleTxt.Text = String.Empty;
             PluginsGrid.Children.Clear();
+            ButtonPluginsPanel.Children.Clear();
 
             LogMessage("Stopping playing...");
             await Task.Run(() => radio.Stop());
@@ -227,6 +228,13 @@ namespace OnlineRadio.GUI
                     Grid.SetColumnSpan(visualPlugin.Control, visualPlugin.ColumnSpan);
                     Grid.SetColumn(visualPlugin.Control, freeCell.X);
                     Grid.SetRow(visualPlugin.Control, freeCell.Y);
+                }
+
+                if (plugin is IButtonPlugin buttonPlugin)
+                {
+                    var button = buttonPlugin.Button;
+                    button.Margin = new Thickness(10, 0, 0, 0);
+                    ButtonPluginsPanel.Children.Add(button);
                 }
 	        }
         }

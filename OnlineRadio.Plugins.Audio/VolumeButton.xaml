@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:OnlineRadio.Plugins.Audio"
              mc:Ignorable="d" 
              d:DesignHeight="28" d:DesignWidth="28">
-    <Button Name="RemoveSourceBtn" Width="28" Margin="0,0,0,0" FontFamily="Segoe UI Symbol" >
+    <Button Name="ChangeVolumeBtn" Width="28" Margin="0,0,0,0" FontFamily="Segoe UI Symbol" Click="ChangeVolumeBtn_Click" >
         &#xE247;
     </Button>
 </UserControl>

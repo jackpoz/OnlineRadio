@@ -21,6 +21,8 @@
                 <Button Name="RemoveSourceBtn" Width="28" Margin="10,0,0,0" FontFamily="Segoe UI Symbol" Click="RemoveSourceBtn_Click">
                     &#xE108;
                 </Button>
+                <StackPanel Name="ButtonPluginsPanel" Height="28" HorizontalAlignment="Left" Orientation="Horizontal" VerticalAlignment="Top">                    
+                </StackPanel>
             </StackPanel>
             <StackPanel Name="InfoPanel">
                 <StackPanel Orientation="Horizontal">

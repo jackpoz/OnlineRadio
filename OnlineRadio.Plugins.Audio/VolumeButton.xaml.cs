@@ -24,5 +24,10 @@ namespace OnlineRadio.Plugins.Audio
         {
             InitializeComponent();
         }
+
+        private void ChangeVolumeBtn_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Not implemented yet");
+        }
     }
 }

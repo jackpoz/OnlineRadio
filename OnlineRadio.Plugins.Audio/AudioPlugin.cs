@@ -26,9 +26,12 @@ namespace OnlineRadio.Plugins.Audio
         {
             get
             {
-                throw new NotImplementedException();
+                if (_button == null)
+                    _button = new VolumeButton();
+                return _button;
             }
         }
+        UserControl _button;
 
         Task playTask;
 
