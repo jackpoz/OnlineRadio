@@ -74,7 +74,7 @@ namespace OnlineRadio.Plugins.Audio
                         await Task.Delay(500);
                     }
                     //StreamBuffer empty, taking a break
-                    else if (stream.Length < 16384 * 2)
+                    else if (stream.Length < 16384 / 4 )
                     {
                         await Task.Delay(500);
                     }
@@ -88,7 +88,6 @@ namespace OnlineRadio.Plugins.Audio
                             WaveFormat waveFormat = new Mp3WaveFormat(frame.SampleRate, frame.ChannelMode == ChannelMode.Mono ? 1 : 2, frame.FrameLength, frame.BitRate);
                             decompressor = new AcmMp3FrameDecompressor(waveFormat);
                             bufferedWaveProvider = new BufferedWaveProvider(decompressor.OutputFormat);
-                            bufferedWaveProvider.BufferDuration = TimeSpan.FromSeconds(5); // allow us to get well ahead of ourselves
                         }
 
                         try
