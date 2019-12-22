@@ -10,9 +10,7 @@
     <Product>OnlineRadio.Console</Product>
     <Copyright>Copyright ©  2012</Copyright>
     <OutputPath>bin\$(Configuration)\</OutputPath>
-    <PostBuildEvent />
-    <PostBuildEvent />
-    <PostBuildEvent />
+	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugType>full</DebugType>
