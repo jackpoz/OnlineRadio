@@ -5,7 +5,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>OnlineRadio.Console</RootNamespace>
     <AssemblyName>OnlineRadio.Console</AssemblyName>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <AssemblyTitle>OnlineRadio.Console</AssemblyTitle>
     <Product>OnlineRadio.Console</Product>
     <Copyright>Copyright ©  2012</Copyright>
@@ -21,10 +21,6 @@
   <PropertyGroup>
     <PostBuildEvent />
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OnlineRadio.Core\OnlineRadio.Core.csproj" />
   </ItemGroup>

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProductVersion>8.0.30703</ProductVersion>
-    <TargetFramework>net46</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <AssemblyTitle>OnlineRadio.Plugins.Audio</AssemblyTitle>
     <Product>OnlineRadio.Plugins.Audio</Product>
     <Copyright>Copyright ©  2012</Copyright>
@@ -10,10 +10,6 @@
     <DebugSymbols>true</DebugSymbols>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OnlineRadio.Core\OnlineRadio.Core.csproj">
       <Private>false</Private>
