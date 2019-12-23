@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using OnlineRadio.Core;
 using System.IO;
 using NAudio.Wave;
@@ -103,7 +100,7 @@ namespace OnlineRadio.Plugins.Audio
 
                         if (waveOut == null)
                         {
-                            waveOut = new WaveOut();
+                            waveOut = new WaveOutEvent();
                             VolumeWaveProvider16 volumeProvider = new VolumeWaveProvider16(bufferedWaveProvider);
                             volumeProvider.Volume = 0.5f;
                             waveOut.Init(volumeProvider);
