@@ -9,13 +9,14 @@
     <OutputPath>..\OnlineRadio.GUI\bin\$(Configuration)\plugins\</OutputPath>
     <DebugSymbols>true</DebugSymbols>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="NAudio" Version="1.9.0" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OnlineRadio.Core\OnlineRadio.Core.csproj">
       <Private>false</Private>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="NAudio" Version="1.9.0" />
   </ItemGroup>
 </Project>
