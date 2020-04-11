@@ -94,6 +94,12 @@ namespace OnlineRadio.Core
 
         public void Start(string pluginsPath = null)
         {
+            if (string.IsNullOrEmpty(Url))
+            {
+                Radio.Log("The specified Url is empty.", this);
+                return;
+            }
+
             if (pluginsPath == null)
                 pluginsPath = Directory.GetCurrentDirectory() + "\\plugins";
             var plugins = pluginManager.LoadPlugins(pluginsPath);
