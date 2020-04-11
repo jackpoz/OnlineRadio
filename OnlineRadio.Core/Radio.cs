@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Net;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Net.Sockets;
@@ -117,7 +118,12 @@ namespace OnlineRadio.Core
             {
                 try
                 {
-                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url);
+                    string streamUrl = Url;
+
+                    if (streamUrl.EndsWith(".m3u", StringComparison.InvariantCultureIgnoreCase))
+                        streamUrl = await GetStreamUrlFromM3U(streamUrl);
+
+                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(streamUrl);
                     request.Headers.Add("icy-metadata", "1");
                     request.ReadWriteTimeout = 10 * 1000;
                     request.Timeout = 10 * 1000;
@@ -210,6 +216,32 @@ namespace OnlineRadio.Core
                     OnStreamOver?.Invoke(this, new StreamOverEventArgs());
                 }
             } while (Running);
+        }
+
+        async Task<string> GetStreamUrlFromM3U(string streamUrl)
+        {
+            var client = new WebClient();
+            var result = await client.DownloadStringTaskAsync(streamUrl);
+
+            var lines = result.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+
+            if (lines.Length == 0)
+                throw new ArgumentException($"The specified m3u url points to an empty file");
+
+            if (lines.First() == "#EXTM3U")
+                throw new NotSupportedException("Extended m3u files are not supported");
+
+            foreach(var line in lines)
+            {
+                // Skip comments
+                if (line.StartsWith('#'))
+                    continue;
+
+                // The first line that is not a comment is the mp3 url
+                return line;
+            }
+
+            throw new InvalidDataException("The specified m3u points to a document with no stream url");
         }
 
         void UpdateCurrentSong(object sender, MetadataEventArgs args)
