@@ -102,10 +102,10 @@ namespace OnlineRadio.Core
             OnStreamUpdate += pluginManager.OnStreamUpdate;
             OnStreamOver += pluginManager.OnStreamOver;
             Running = true;
-            runningTask = Task.Run(() => GetHttpStream());
+            runningTask = Task.Run(GetHttpStreamAsync);
         }
 
-        void GetHttpStream()
+        async Task GetHttpStreamAsync()
         {
             do
             {
@@ -135,7 +135,7 @@ namespace OnlineRadio.Core
                             {
                                 if (bufferPosition >= readBytes)
                                 {
-                                    readBytes = socketStream.Read(buffer, 0, buffer.Length);
+                                    readBytes = await socketStream.ReadAsync(buffer, 0, buffer.Length);
                                     bufferPosition = 0;
                                 }
                                 if (readBytes <= 0)
@@ -196,6 +196,11 @@ namespace OnlineRadio.Core
                 catch (WebException ex)
                 {
                     Radio.Log(string.Format("Handled WebException, reconnecting. Details:\n{0}\n{1}", ex.Message, ex.StackTrace), this);
+                    OnStreamOver?.Invoke(this, new StreamOverEventArgs());
+                }
+                catch(Exception ex)
+                {
+                    Radio.Log(string.Format("Handled Exception, reconnecting. Details:\n{0}\n{1}", ex.Message, ex.StackTrace), this);
                     OnStreamOver?.Invoke(this, new StreamOverEventArgs());
                 }
             } while (Running);
