@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace OnlineRadio.Plugins.Lyrics
     public partial class LyricsPlugin : UserControl, IVisualPlugin
     {
         const string lyricsUrl = "http://api.musixmatch.com/ws/1.1/matcher.lyrics.get?q_track={0}&q_artist={1}";
-        readonly Encoding encode = System.Text.Encoding.GetEncoding("utf-8");
+        HttpClient httpClient;
 
         UserControl IVisualPlugin.Control
         {
@@ -62,14 +63,12 @@ namespace OnlineRadio.Plugins.Lyrics
 
         public void OnCurrentSongChanged(object sender, CurrentSongEventArgs args)
         {
-            Task.Run(() =>
+            Task.Run(async () =>
             {
                 try
                 {
-                    WebRequest request = GetRequest(string.Format(lyricsUrl, args.NewSong.Title, args.NewSong.Artist));
-                    WebResponse response = request.GetResponse();
-                    StreamReader responseStream = new StreamReader(response.GetResponseStream(), encode);
-                    JObject json = JObject.Parse(responseStream.ReadToEnd());
+                    var response = await GetResponse(string.Format(lyricsUrl, args.NewSong.Title, args.NewSong.Artist));
+                    JObject json = JObject.Parse(response);
                     if ((string)json["message"]["header"]["status_code"] == "401")
                         SetLyrics("Unathorized call to Lyrics API, please check \"apikey\" parameter in the plugin config file."
                                 + "Current value: \"" + ApiKey + "\"");
@@ -95,14 +94,14 @@ namespace OnlineRadio.Plugins.Lyrics
 
         public LyricsPlugin()
         {
+            httpClient = new HttpClient();
             InitializeComponent();
         }
 
-        WebRequest GetRequest(string url)
+        async Task<string> GetResponse(string url)
         {
             url += "&apikey=" + ApiKey;
-            WebRequest request = WebRequest.Create(url);
-            return request;
+            return await httpClient.GetStringAsync(url);
         }
     }
 }
