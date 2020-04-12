@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,10 +14,40 @@ namespace OnlineRadio.Core.StreamHandlers
         {
             if (streamUrl.EndsWith(".m3u", StringComparison.InvariantCultureIgnoreCase) || streamUrl.EndsWith(".m3u8", StringComparison.InvariantCultureIgnoreCase))
             {
-                return new M3UStreamHandler(streamUrl, httpClient);
+                // Handle standard m3u streams (not extended m3u) as normal mp3 streams after retrieving the mp3 url
+                var m3uStreamUrl = await TryGetStreamUrlFromM3U(streamUrl, httpClient);
+                if (!string.IsNullOrEmpty(m3uStreamUrl))
+                    return new MP3StreamHandler(m3uStreamUrl, httpClient);
+                else
+                    return new M3UStreamHandler(streamUrl, httpClient);
             }
             else
                 return new MP3StreamHandler(streamUrl, httpClient);
+        }
+
+        static async Task<string> TryGetStreamUrlFromM3U(string streamUrl, HttpClient httpClient)
+        {
+            var result = await httpClient.GetStringAsync(streamUrl);
+
+            var lines = result.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+
+            if (lines.Length == 0)
+                throw new ArgumentException($"The specified m3u url points to an empty file");
+
+            if (lines.First() == "#EXTM3U")
+                return null;
+
+            foreach (var line in lines)
+            {
+                // Skip comments
+                if (line.StartsWith('#'))
+                    continue;
+
+                // The first line that is not a comment is the mp3 url
+                return line;
+            }
+
+            return null;
         }
 
         protected readonly HttpClient Client;

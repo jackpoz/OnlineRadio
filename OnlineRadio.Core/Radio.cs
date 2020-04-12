@@ -212,31 +212,6 @@ namespace OnlineRadio.Core
             } while (Running);
         }
 
-        async Task<string> GetStreamUrlFromM3U(string streamUrl)
-        {
-            var result = await httpClient.GetStringAsync(streamUrl);
-
-            var lines = result.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
-
-            if (lines.Length == 0)
-                throw new ArgumentException($"The specified m3u url points to an empty file");
-
-            if (lines.First() == "#EXTM3U")
-                throw new NotSupportedException("Extended m3u files are not supported");
-
-            foreach(var line in lines)
-            {
-                // Skip comments
-                if (line.StartsWith('#'))
-                    continue;
-
-                // The first line that is not a comment is the mp3 url
-                return line;
-            }
-
-            throw new InvalidDataException("The specified m3u points to a document with no stream url");
-        }
-
         void UpdateCurrentSong(object sender, MetadataEventArgs args)
         {
             foreach (var metadataSongPattern in metadataSongPatterns)
