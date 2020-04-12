@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Threading;
 using System.Collections.ObjectModel;
+using System.Net.Http;
 
 namespace OnlineRadio.Core
 {
@@ -84,6 +85,7 @@ namespace OnlineRadio.Core
         public static event EventHandler<MessageLogEventArgs> OnMessageLogged;
 
         PluginManager pluginManager;
+        HttpClient httpClient;
 
         public Radio(string Url, bool ArtistTitleOrderInverted)
         {
@@ -91,6 +93,10 @@ namespace OnlineRadio.Core
             this.ArtistTitleOrderInverted = ArtistTitleOrderInverted;
             OnMetadataChanged += UpdateCurrentSong;
             pluginManager = new PluginManager();
+            this.httpClient = new HttpClient
+            {
+                Timeout = new TimeSpan(0, 0, 10)
+            };
         }
 
         public void Start(string pluginsPath = null)
@@ -123,18 +129,24 @@ namespace OnlineRadio.Core
                     if (streamUrl.EndsWith(".m3u", StringComparison.InvariantCultureIgnoreCase))
                         streamUrl = await GetStreamUrlFromM3U(streamUrl);
 
-                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(streamUrl);
-                    request.Headers.Add("icy-metadata", "1");
-                    request.ReadWriteTimeout = 10 * 1000;
-                    request.Timeout = 10 * 1000;
-                    using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                    var request = new HttpRequestMessage
+                    {
+                        RequestUri = new Uri(streamUrl),
+                        Method = HttpMethod.Get,
+                        Headers =
+                        {
+                            { "icy-metadata", "1" }
+                        }
+                    };
+
+                    using (HttpResponseMessage response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead))
                     {
                         //get the position of metadata
                         int metaInt = 0;
-                        if (!string.IsNullOrEmpty(response.GetResponseHeader("icy-metaint")))
-                            metaInt = Convert.ToInt32(response.GetResponseHeader("icy-metaint"));
+                        if (response.Headers.TryGetValues("icy-metaint", out var icyHeader))
+                            metaInt = Convert.ToInt32(icyHeader.FirstOrDefault() ?? "0");
 
-                        using (Stream socketStream = response.GetResponseStream())
+                        using (Stream socketStream = await response.Content.ReadAsStreamAsync())
                         using (MemoryStream metadataData = new MemoryStream())
                         {
                             byte[] buffer = new byte[16384];
@@ -220,8 +232,7 @@ namespace OnlineRadio.Core
 
         async Task<string> GetStreamUrlFromM3U(string streamUrl)
         {
-            var client = new WebClient();
-            var result = await client.DownloadStringTaskAsync(streamUrl);
+            var result = await httpClient.GetStringAsync(streamUrl);
 
             var lines = result.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
 
@@ -294,6 +305,8 @@ namespace OnlineRadio.Core
             pluginManager.Dispose();
             pluginManager = null;
             OnMessageLogged = null;
+            httpClient.Dispose();
+            httpClient = null;
         }
 
         public void Stop()
