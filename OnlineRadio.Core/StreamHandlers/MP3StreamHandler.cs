@@ -12,12 +12,11 @@ namespace OnlineRadio.Core.StreamHandlers
     {
         HttpResponseMessage response;
         Stream socketStream;
-        byte[] buffer;
+        byte[] buffer = new byte[16384];
 
         public MP3StreamHandler(string streamUrl, HttpClient httpClient)
             : base(streamUrl, httpClient)
         {
-             buffer = new byte[16384];
         }
 
         public async override Task StartAsync()

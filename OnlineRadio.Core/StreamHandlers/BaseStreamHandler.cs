@@ -12,30 +12,29 @@ namespace OnlineRadio.Core.StreamHandlers
     {
         public static async Task<BaseStreamHandler> GetStreamHandler(string streamUrl, HttpClient httpClient)
         {
-            if (streamUrl.EndsWith(".m3u", StringComparison.InvariantCultureIgnoreCase) || streamUrl.EndsWith(".m3u8", StringComparison.InvariantCultureIgnoreCase))
+            if (streamUrl.EndsWith(".m3u", StringComparison.InvariantCultureIgnoreCase))
             {
                 // Handle standard m3u streams (not extended m3u) as normal mp3 streams after retrieving the mp3 url
-                var m3uStreamUrl = await TryGetStreamUrlFromM3U(streamUrl, httpClient);
-                if (!string.IsNullOrEmpty(m3uStreamUrl))
-                    return new MP3StreamHandler(m3uStreamUrl, httpClient);
-                else
-                    return new M3UStreamHandler(streamUrl, httpClient);
+                var m3uStreamUrl = await GetStreamUrlFromM3U(streamUrl, httpClient);
+                return new MP3StreamHandler(m3uStreamUrl, httpClient);                    
             }
+            else if (streamUrl.EndsWith(".m3u8", StringComparison.InvariantCultureIgnoreCase))
+                return new M3U8StreamHandler(streamUrl, httpClient);
             else
                 return new MP3StreamHandler(streamUrl, httpClient);
         }
 
-        static async Task<string> TryGetStreamUrlFromM3U(string streamUrl, HttpClient httpClient)
+        static async Task<string> GetStreamUrlFromM3U(string streamUrl, HttpClient httpClient)
         {
             var result = await httpClient.GetStringAsync(streamUrl);
 
-            var lines = result.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            var lines = result.Split(new [] { Environment.NewLine, "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
             if (lines.Length == 0)
-                throw new ArgumentException($"The specified m3u url points to an empty file");
+                throw new ArgumentException("The specified m3u url points to an empty file");
 
             if (lines.First() == "#EXTM3U")
-                return null;
+                throw new NotSupportedException("Extended m3u files are not supported");
 
             foreach (var line in lines)
             {
@@ -47,7 +46,7 @@ namespace OnlineRadio.Core.StreamHandlers
                 return line;
             }
 
-            return null;
+            throw new InvalidDataException("The specified m3u points to a document with no stream url");
         }
 
         protected readonly HttpClient Client;
