@@ -77,6 +77,8 @@ namespace OnlineRadio.Core
         SongInfo _currentSong;
         public event EventHandler<CurrentSongEventArgs> OnCurrentSongChanged;
 
+        public event EventHandler<StreamStartEventArgs> OnStreamStart;
+
         public event EventHandler<StreamUpdateEventArgs> OnStreamUpdate;
 
         public event EventHandler<StreamOverEventArgs> OnStreamOver;
@@ -113,6 +115,7 @@ namespace OnlineRadio.Core
             var plugins = pluginManager.LoadPlugins(pluginsPath);
             OnPluginsLoaded?.Invoke(this, new PluginEventArgs(plugins));
             OnCurrentSongChanged += pluginManager.OnCurrentSongChanged;
+            OnStreamStart += pluginManager.OnStreamStart;
             OnStreamUpdate += pluginManager.OnStreamUpdate;
             OnStreamOver += pluginManager.OnStreamOver;
             Running = true;
@@ -137,6 +140,8 @@ namespace OnlineRadio.Core
                         int streamPosition = 0;
                         int bufferPosition = 0;
                         int readBytes = 0;
+
+                        OnStreamStart?.Invoke(this, new StreamStartEventArgs(streamHandler.GetCodec()));
 
                         while (Running)
                         {                            
@@ -257,6 +262,7 @@ namespace OnlineRadio.Core
 
             Running = false;
             OnCurrentSongChanged -= pluginManager.OnCurrentSongChanged;
+            OnStreamStart -= pluginManager.OnStreamStart;
             OnStreamUpdate -= pluginManager.OnStreamUpdate;
             OnStreamOver -= pluginManager.OnStreamOver;
             pluginManager.Dispose();
@@ -313,6 +319,15 @@ namespace OnlineRadio.Core
         {
             this.OldSong = OldSong;
             this.NewSong = NewSong;
+        }
+    }
+
+    public class StreamStartEventArgs : EventArgs
+    {
+        public string Codec { get; private set; }
+        public StreamStartEventArgs(string codec)
+        {
+            this.Codec = codec;
         }
     }
 

@@ -64,6 +64,8 @@ namespace OnlineRadio.Core.StreamHandlers
 
         public abstract Task<(int bytesRead, byte[] buffer)> ReadAsync();
 
+        public abstract string GetCodec();
+
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
         private List<IDisposable> objectsToDispose = new List<IDisposable>();

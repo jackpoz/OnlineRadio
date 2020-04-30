@@ -52,5 +52,10 @@ namespace OnlineRadio.Core.StreamHandlers
 
             return (bytesRead, buffer);
         }
+
+        public override string GetCodec()
+        {
+           return "mp3";
+        }
     }
 }

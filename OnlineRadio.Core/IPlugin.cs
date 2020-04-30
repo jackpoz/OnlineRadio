@@ -9,6 +9,8 @@
 
         void OnCurrentSongChanged(object sender, CurrentSongEventArgs args);
 
+        void OnStreamStart(object sender, StreamStartEventArgs args);
+
         void OnStreamUpdate(object sender, StreamUpdateEventArgs args);
 
         void OnStreamOver(object sender, StreamOverEventArgs args);
@@ -25,6 +27,11 @@
         }
 
         public void OnCurrentSongChanged(object sender, CurrentSongEventArgs args)
+        {
+            // Do nothing
+        }
+
+        public void OnStreamStart(object sender, StreamStartEventArgs args)
         {
             // Do nothing
         }

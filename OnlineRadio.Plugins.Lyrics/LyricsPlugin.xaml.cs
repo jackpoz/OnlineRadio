@@ -82,6 +82,11 @@ namespace OnlineRadio.Plugins.Lyrics
             });
         }
 
+        public void OnStreamStart(object sender, StreamStartEventArgs args)
+        {
+            // Do nothing
+        }
+
         public void OnStreamUpdate(object sender, StreamUpdateEventArgs args)
         {
             // Do nothing

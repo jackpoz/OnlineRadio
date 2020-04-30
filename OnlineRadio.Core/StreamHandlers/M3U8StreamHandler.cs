@@ -118,6 +118,11 @@ namespace OnlineRadio.Core.StreamHandlers
             return (bytesRead, buffer);
         }
 
+        public override string GetCodec()
+        {
+            throw new NotImplementedException();
+        }
+
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 

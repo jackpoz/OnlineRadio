@@ -14,12 +14,19 @@ namespace OnlineRadio.Plugins.Audio
         {
             get { return "AudioPlugin"; }
         }
+
         bool IsPlaying
         {
             get;
             set;
         }
         Task playTask;
+
+        string Codec
+        {
+            get;
+            set;
+        }
 
         public AudioPlugin()
         {
@@ -29,6 +36,11 @@ namespace OnlineRadio.Plugins.Audio
         public void OnCurrentSongChanged(object sender, CurrentSongEventArgs args)
         {
             // Do nothing
+        }
+
+        public void OnStreamStart(object sender, StreamStartEventArgs args)
+        {
+            Codec = args.Codec;
         }
 
         public void OnStreamUpdate(object sender, StreamUpdateEventArgs args)
@@ -48,7 +60,14 @@ namespace OnlineRadio.Plugins.Audio
         void StartPlay()
         {
             IsPlaying = true;
-            playTask = Task.Run(DecompressFrames);
+            switch (Codec)
+            {
+                case "mp3":
+                    playTask = Task.Run(DecompressFrames);
+                    break;
+                default:
+                    break;
+            }
         }
 
         #region NAudio
