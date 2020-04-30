@@ -63,10 +63,13 @@ namespace OnlineRadio.Plugins.Audio
             switch (Codec)
             {
                 case "mp3":
-                    playTask = Task.Run(DecompressFrames);
+                    playTask = Task.Run(PlayMP3Async);
+                    break;
+                case "aac":
+                    playTask = Task.Run(PlayAACAsync);
                     break;
                 default:
-                    break;
+                    throw new NotSupportedException($"Codec {Codec} is not supported by {nameof(AudioPlugin)}");
             }
         }
 
@@ -76,7 +79,7 @@ namespace OnlineRadio.Plugins.Audio
         IMp3FrameDecompressor decompressor;
         BufferedWaveProvider bufferedWaveProvider;
 
-        private async Task DecompressFrames()
+        private async Task PlayMP3Async()
         {
             byte[] buffer = new byte[16384 * 4]; // needs to be big enough to hold a decompressed frame
 
@@ -134,6 +137,11 @@ namespace OnlineRadio.Plugins.Audio
             } while (IsPlaying);
 
             CleanUpAudio();
+        }
+
+        private async Task PlayAACAsync()
+        {
+
         }
 
         private void CleanUpAudio()

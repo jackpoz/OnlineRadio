@@ -120,7 +120,7 @@ namespace OnlineRadio.Core.StreamHandlers
 
         public override string GetCodec()
         {
-            throw new NotImplementedException();
+            return "aac";
         }
 
         #region IDisposable Support
