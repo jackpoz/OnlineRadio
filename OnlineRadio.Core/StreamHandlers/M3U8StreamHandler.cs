@@ -4,14 +4,18 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace OnlineRadio.Core.StreamHandlers
 {
     class M3U8StreamHandler : BaseStreamHandler
     {
+        private const string CodecPattern = @"CODECS=""(?<codec>[^.]+).+""";
+
         string subStreamUrl;
         Queue<string> chunkStreamUrls = new Queue<string>();
+        string codec;
 
         HttpResponseMessage response;
         Stream socketStream;
@@ -45,7 +49,12 @@ namespace OnlineRadio.Core.StreamHandlers
             {
                 // Skip comments
                 if (line.StartsWith('#'))
+                {
+                    var match = Regex.Match(line, CodecPattern);
+                    if (match.Success)
+                        codec = match.Groups["codec"].Value;
                     continue;
+                }
 
                 // The first line that is not a comment is the mp3 url
                 return line;
@@ -120,7 +129,7 @@ namespace OnlineRadio.Core.StreamHandlers
 
         public override string GetCodec()
         {
-            return "aac";
+            return codec;
         }
 
         #region IDisposable Support
