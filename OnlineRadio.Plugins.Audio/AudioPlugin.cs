@@ -65,8 +65,8 @@ namespace OnlineRadio.Plugins.Audio
                 case "mp3":
                     playTask = Task.Run(PlayMP3Async);
                     break;
-                case "aac":
-                    playTask = Task.Run(PlayAACAsync);
+                case "mp4a":
+                    playTask = Task.Run(PlayMP4AAsync);
                     break;
                 default:
                     throw new NotSupportedException($"Codec {Codec} is not supported by {nameof(AudioPlugin)}");
@@ -134,12 +134,16 @@ namespace OnlineRadio.Plugins.Audio
                 {
                     CleanUpAudio();
                 }
+                catch(Exception)
+                {
+                    CleanUpAudio();
+                }
             } while (IsPlaying);
 
             CleanUpAudio();
         }
 
-        private async Task PlayAACAsync()
+        private async Task PlayMP4AAsync()
         {
 
         }
@@ -177,7 +181,10 @@ namespace OnlineRadio.Plugins.Audio
     {
         public override bool CanRead
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                return true;
+            }
         }
 
         public override bool CanSeek
@@ -187,7 +194,10 @@ namespace OnlineRadio.Plugins.Audio
 
         public override bool CanWrite
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                return true;
+            }
         }
 
         public override void Flush()
