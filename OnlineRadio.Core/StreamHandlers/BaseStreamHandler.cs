@@ -26,7 +26,7 @@ namespace OnlineRadio.Core.StreamHandlers
 
         static async Task<string> GetStreamUrlFromM3U(string streamUrl, HttpClient httpClient)
         {
-            var result = await httpClient.GetStringAsync(streamUrl);
+            var result = await httpClient.GetStringAsync(streamUrl).ConfigureAwait(false);
 
             var lines = result.Split(new [] { Environment.NewLine, "\n" }, StringSplitOptions.RemoveEmptyEntries);
 

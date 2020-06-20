@@ -11,7 +11,7 @@ namespace OnlineRadio.Core.StreamHandlers
 {
     class M3U8StreamHandler : BaseStreamHandler
     {
-        private const string CodecPattern = @"CODECS=""(?<codec>[^.]+).+""";
+        private const string CodecPattern = @"CODECS=""(?<codec>[^.]+).*""";
 
         string subStreamUrl;
         Queue<string> chunkStreamUrls = new Queue<string>();
@@ -28,14 +28,14 @@ namespace OnlineRadio.Core.StreamHandlers
 
         public async override Task StartAsync()
         {
-            subStreamUrl = await GetSubStreamUrlAsync();
-            await RefreshChunkStreamUrlsAsync();
-            await ReadNextChunkAsync();
+            subStreamUrl = await GetSubStreamUrlAsync().ConfigureAwait(false);
+            await RefreshChunkStreamUrlsAsync().ConfigureAwait(false);
+            await ReadNextChunkAsync().ConfigureAwait(false);
         }
 
         async Task<string> GetSubStreamUrlAsync()
         {
-            var result = await Client.GetStringAsync(StreamUrl);
+            var result = await Client.GetStringAsync(StreamUrl).ConfigureAwait(false);
 
             var lines = result.Split(new[] { Environment.NewLine, "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -65,7 +65,7 @@ namespace OnlineRadio.Core.StreamHandlers
 
         async Task RefreshChunkStreamUrlsAsync()
         {
-            var result = await Client.GetStringAsync(subStreamUrl);
+            var result = await Client.GetStringAsync(subStreamUrl).ConfigureAwait(false);
 
             var lines = result.Split(new[] { Environment.NewLine, "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -94,8 +94,8 @@ namespace OnlineRadio.Core.StreamHandlers
                 Method = HttpMethod.Get
             };
 
-            response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
-            socketStream = await response.Content.ReadAsStreamAsync();
+            response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+            socketStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
         }
 
         async Task OnChunkFinishedReadingAsync()
@@ -104,9 +104,9 @@ namespace OnlineRadio.Core.StreamHandlers
 
             // Buffer the list of chunks if we have only 1 left
             if (chunkStreamUrls.Count <= 1)
-                await RefreshChunkStreamUrlsAsync();
+                await RefreshChunkStreamUrlsAsync().ConfigureAwait(false);
 
-            await ReadNextChunkAsync();
+            await ReadNextChunkAsync().ConfigureAwait(false);
         }
 
         public override int GetIceCastMetaInterval()
@@ -116,12 +116,12 @@ namespace OnlineRadio.Core.StreamHandlers
 
         public override async Task<(int bytesRead, byte[] buffer)> ReadAsync()
         {
-            var bytesRead = await socketStream.ReadAsync(buffer, 0, buffer.Length);
+            var bytesRead = await socketStream.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
 
             if (bytesRead == 0)
             {
-                await OnChunkFinishedReadingAsync();
-                return await ReadAsync();
+                await OnChunkFinishedReadingAsync().ConfigureAwait(false);
+                return await ReadAsync().ConfigureAwait(false);
             }
 
             return (bytesRead, buffer);

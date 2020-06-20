@@ -31,10 +31,10 @@ namespace OnlineRadio.Core.StreamHandlers
                 }
             };
 
-            response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
             ToBeDisposed(response);
 
-            socketStream = await response.Content.ReadAsStreamAsync();
+            socketStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
             ToBeDisposed(socketStream);
         }
 
@@ -48,7 +48,7 @@ namespace OnlineRadio.Core.StreamHandlers
 
         public override async Task<(int bytesRead, byte[] buffer)> ReadAsync()
         {
-            var bytesRead = await socketStream.ReadAsync(buffer, 0, buffer.Length);
+            var bytesRead = await socketStream.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
 
             return (bytesRead, buffer);
         }

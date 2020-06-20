@@ -78,6 +78,7 @@ namespace OnlineRadio.Plugins.Audio
         IWavePlayer waveOut;
         IMp3FrameDecompressor decompressor;
         BufferedWaveProvider bufferedWaveProvider;
+        StreamMediaFoundationReader mediaReader;
 
         private async Task PlayMP3Async()
         {
@@ -90,12 +91,12 @@ namespace OnlineRadio.Plugins.Audio
                     //WaveBuffer getting full, taking a break
                     if (bufferedWaveProvider != null && bufferedWaveProvider.BufferLength - bufferedWaveProvider.BufferedBytes < bufferedWaveProvider.WaveFormat.AverageBytesPerSecond / 2)
                     {
-                        await Task.Delay(500);
+                        await Task.Delay(500).ConfigureAwait(false);
                     }
                     //StreamBuffer empty, taking a break
                     else if (stream.Length < 16384 / 4 )
                     {
-                        await Task.Delay(500);
+                        await Task.Delay(500).ConfigureAwait(false);
                     }
                     else
                     {
@@ -145,7 +146,41 @@ namespace OnlineRadio.Plugins.Audio
 
         private async Task PlayMP4AAsync()
         {
+            do
+            {
+                try
+                {
+                    //StreamBuffer empty, taking a break
+                    if (stream.Length < 16384 / 4)
+                    {
+                        await Task.Delay(500).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        if (mediaReader == null)
+                            mediaReader = new StreamMediaFoundationReader(stream);
 
+                        if (waveOut == null)
+                        {
+                            waveOut = new WaveOutEvent();
+                            VolumeWaveProvider16 volumeProvider = new VolumeWaveProvider16(mediaReader);
+                            volumeProvider.Volume = 0.5f;
+                            waveOut.Init(volumeProvider);
+                            waveOut.Play();
+                        }
+                    }
+                }
+                catch (EndOfStreamException)
+                {
+                    CleanUpAudio();
+                }
+                catch (Exception)
+                {
+                    CleanUpAudio();
+                }
+            } while (IsPlaying);
+
+            CleanUpAudio();
         }
 
         private void CleanUpAudio()
@@ -161,6 +196,12 @@ namespace OnlineRadio.Plugins.Audio
             {
                 decompressor.Dispose();
                 decompressor = null;
+            }
+
+            if (mediaReader != null)
+            {
+                mediaReader.Dispose();
+                mediaReader = null;
             }
 
             bufferedWaveProvider = null;
