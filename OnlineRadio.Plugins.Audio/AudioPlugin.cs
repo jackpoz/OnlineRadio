@@ -54,7 +54,6 @@ namespace OnlineRadio.Plugins.Audio
         {
             IsPlaying = false;
             playTask?.Wait();
-            StartPlay();
         }
 
         void StartPlay()
