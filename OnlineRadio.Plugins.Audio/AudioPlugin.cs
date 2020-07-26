@@ -14,12 +14,19 @@ namespace OnlineRadio.Plugins.Audio
         {
             get { return "AudioPlugin"; }
         }
+
         bool IsPlaying
         {
             get;
             set;
         }
         Task playTask;
+
+        string Codec
+        {
+            get;
+            set;
+        }
 
         public AudioPlugin()
         {
@@ -29,6 +36,11 @@ namespace OnlineRadio.Plugins.Audio
         public void OnCurrentSongChanged(object sender, CurrentSongEventArgs args)
         {
             // Do nothing
+        }
+
+        public void OnStreamStart(object sender, StreamStartEventArgs args)
+        {
+            Codec = args.Codec;
         }
 
         public void OnStreamUpdate(object sender, StreamUpdateEventArgs args)
@@ -42,13 +54,22 @@ namespace OnlineRadio.Plugins.Audio
         {
             IsPlaying = false;
             playTask?.Wait();
-            StartPlay();
         }
 
         void StartPlay()
         {
             IsPlaying = true;
-            playTask = Task.Run(DecompressFrames);
+            switch (Codec)
+            {
+                case "mp3":
+                    playTask = Task.Run(PlayMP3Async);
+                    break;
+                case "mp4a":
+                    playTask = Task.Run(PlayMP4AAsync);
+                    break;
+                default:
+                    throw new NotSupportedException($"Codec {Codec} is not supported by {nameof(AudioPlugin)}");
+            }
         }
 
         #region NAudio
@@ -56,8 +77,9 @@ namespace OnlineRadio.Plugins.Audio
         IWavePlayer waveOut;
         IMp3FrameDecompressor decompressor;
         BufferedWaveProvider bufferedWaveProvider;
+        StreamMediaFoundationReader mediaReader;
 
-        private async Task DecompressFrames()
+        private async Task PlayMP3Async()
         {
             byte[] buffer = new byte[16384 * 4]; // needs to be big enough to hold a decompressed frame
 
@@ -68,12 +90,12 @@ namespace OnlineRadio.Plugins.Audio
                     //WaveBuffer getting full, taking a break
                     if (bufferedWaveProvider != null && bufferedWaveProvider.BufferLength - bufferedWaveProvider.BufferedBytes < bufferedWaveProvider.WaveFormat.AverageBytesPerSecond / 2)
                     {
-                        await Task.Delay(500);
+                        await Task.Delay(500).ConfigureAwait(false);
                     }
                     //StreamBuffer empty, taking a break
                     else if (stream.Length < 16384 / 4 )
                     {
-                        await Task.Delay(500);
+                        await Task.Delay(500).ConfigureAwait(false);
                     }
                     else
                     {
@@ -112,6 +134,31 @@ namespace OnlineRadio.Plugins.Audio
                 {
                     CleanUpAudio();
                 }
+                catch(Exception)
+                {
+                    CleanUpAudio();
+                }
+            } while (IsPlaying);
+
+            CleanUpAudio();
+        }
+
+        private async Task PlayMP4AAsync()
+        {
+            do
+            {
+                try
+                {
+                    throw new NotImplementedException();
+                }
+                catch (EndOfStreamException)
+                {
+                    CleanUpAudio();
+                }
+                catch (Exception)
+                {
+                    CleanUpAudio();
+                }
             } while (IsPlaying);
 
             CleanUpAudio();
@@ -132,6 +179,12 @@ namespace OnlineRadio.Plugins.Audio
                 decompressor = null;
             }
 
+            if (mediaReader != null)
+            {
+                mediaReader.Dispose();
+                mediaReader = null;
+            }
+
             bufferedWaveProvider = null;
             stream.Flush();
         }
@@ -150,7 +203,10 @@ namespace OnlineRadio.Plugins.Audio
     {
         public override bool CanRead
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                return true;
+            }
         }
 
         public override bool CanSeek
@@ -160,7 +216,10 @@ namespace OnlineRadio.Plugins.Audio
 
         public override bool CanWrite
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                return true;
+            }
         }
 
         public override void Flush()

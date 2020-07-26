@@ -10,6 +10,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Collections.ObjectModel;
 using System.Net.Http;
+using OnlineRadio.Core.StreamHandlers;
 
 namespace OnlineRadio.Core
 {
@@ -76,6 +77,8 @@ namespace OnlineRadio.Core
         SongInfo _currentSong;
         public event EventHandler<CurrentSongEventArgs> OnCurrentSongChanged;
 
+        public event EventHandler<StreamStartEventArgs> OnStreamStart;
+
         public event EventHandler<StreamUpdateEventArgs> OnStreamUpdate;
 
         public event EventHandler<StreamOverEventArgs> OnStreamOver;
@@ -112,6 +115,7 @@ namespace OnlineRadio.Core
             var plugins = pluginManager.LoadPlugins(pluginsPath);
             OnPluginsLoaded?.Invoke(this, new PluginEventArgs(plugins));
             OnCurrentSongChanged += pluginManager.OnCurrentSongChanged;
+            OnStreamStart += pluginManager.OnStreamStart;
             OnStreamUpdate += pluginManager.OnStreamUpdate;
             OnStreamOver += pluginManager.OnStreamOver;
             Running = true;
@@ -124,84 +128,67 @@ namespace OnlineRadio.Core
             {
                 try
                 {
-                    string streamUrl = Url;
-
-                    if (streamUrl.EndsWith(".m3u", StringComparison.InvariantCultureIgnoreCase))
-                        streamUrl = await GetStreamUrlFromM3U(streamUrl);
-
-                    var request = new HttpRequestMessage
-                    {
-                        RequestUri = new Uri(streamUrl),
-                        Method = HttpMethod.Get,
-                        Headers =
-                        {
-                            { "icy-metadata", "1" }
-                        }
-                    };
-
-                    using (HttpResponseMessage response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead))
+                    using var streamHandler = await BaseStreamHandler.GetStreamHandler(Url, httpClient).ConfigureAwait(false);
+                    await streamHandler.StartAsync().ConfigureAwait(false);
                     {
                         //get the position of metadata
-                        int metaInt = 0;
-                        if (response.Headers.TryGetValues("icy-metaint", out var icyHeader))
-                            metaInt = Convert.ToInt32(icyHeader.FirstOrDefault() ?? "0");
+                        int metaInt = streamHandler.GetIceCastMetaInterval();
 
-                        using (Stream socketStream = await response.Content.ReadAsStreamAsync())
-                        using (MemoryStream metadataData = new MemoryStream())
-                        {
-                            byte[] buffer = new byte[16384];
-                            int metadataLength = 0;
-                            int streamPosition = 0;
-                            int bufferPosition = 0;
-                            int readBytes = 0;
+                        using MemoryStream metadataData = new MemoryStream();
+                        byte[] buffer = null;
+                        int metadataLength = 0;
+                        int streamPosition = 0;
+                        int bufferPosition = 0;
+                        int readBytes = 0;
 
-                            while (Running)
+                        OnStreamStart?.Invoke(this, new StreamStartEventArgs(streamHandler.GetCodec()));
+
+                        while (Running)
+                        {                            
+                            if (bufferPosition >= readBytes)
                             {
-                                if (bufferPosition >= readBytes)
+                                (readBytes, buffer) = await streamHandler.ReadAsync().ConfigureAwait(false);
+                                bufferPosition = 0;
+                            }
+                            if (readBytes <= 0)
+                            {
+                                Radio.Log("Stream over", this);
+                                break;
+                            }
+
+                            if (metadataLength == 0)
+                            {
+                                if (metaInt == 0 || streamPosition + readBytes - bufferPosition <= metaInt)
                                 {
-                                    readBytes = await socketStream.ReadAsync(buffer, 0, buffer.Length);
-                                    bufferPosition = 0;
-                                }
-                                if (readBytes <= 0)
-                                {
-                                    Radio.Log("Stream over", this);
-                                    break;
+                                    streamPosition += readBytes - bufferPosition;
+                                    ProcessStreamData(buffer, ref bufferPosition, readBytes - bufferPosition);
+                                    continue;
                                 }
 
+                                ProcessStreamData(buffer, ref bufferPosition, metaInt - streamPosition);
+                                metadataLength = Convert.ToInt32(buffer[bufferPosition++]) * 16;
+                                //check if there's any metadata, otherwise skip to next block
                                 if (metadataLength == 0)
                                 {
-                                    if (metaInt == 0 || streamPosition + readBytes - bufferPosition <= metaInt)
-                                    {
-                                        streamPosition += readBytes - bufferPosition;
-                                        ProcessStreamData(buffer, ref bufferPosition, readBytes - bufferPosition);
-                                        continue;
-                                    }
-
-                                    ProcessStreamData(buffer, ref bufferPosition, metaInt - streamPosition);
-                                    metadataLength = Convert.ToInt32(buffer[bufferPosition++]) * 16;
-                                    //check if there's any metadata, otherwise skip to next block
-                                    if (metadataLength == 0)
-                                    {
-                                        streamPosition = Math.Min(readBytes - bufferPosition, metaInt);
-                                        ProcessStreamData(buffer, ref bufferPosition, streamPosition);
-                                        continue;
-                                    }
+                                    streamPosition = Math.Min(readBytes - bufferPosition, metaInt);
+                                    ProcessStreamData(buffer, ref bufferPosition, streamPosition);
+                                    continue;
                                 }
+                            }
 
-                                //get the metadata and reset the position
-                                while (bufferPosition < readBytes)
+                            //get the metadata and reset the position
+                            while (bufferPosition < readBytes)
+                            {
+                                metadataData.WriteByte(buffer[bufferPosition++]);
+                                metadataLength--;
+                                if (metadataLength == 0)
                                 {
-                                    metadataData.WriteByte(buffer[bufferPosition++]);
-                                    metadataLength--;
-                                    if (metadataLength == 0)
-                                    {
-                                        var metadataBuffer = metadataData.ToArray();
-                                        Metadata = Encoding.UTF8.GetString(metadataBuffer);
-                                        metadataData.SetLength(0);
-                                        streamPosition = Math.Min(readBytes - bufferPosition, metaInt);
-                                        ProcessStreamData(buffer, ref bufferPosition, streamPosition);
-                                        break;
-                                    }
+                                    var metadataBuffer = metadataData.ToArray();
+                                    Metadata = Encoding.UTF8.GetString(metadataBuffer);
+                                    metadataData.SetLength(0);
+                                    streamPosition = Math.Min(readBytes - bufferPosition, metaInt);
+                                    ProcessStreamData(buffer, ref bufferPosition, streamPosition);
+                                    break;
                                 }
                             }
                         }
@@ -228,31 +215,6 @@ namespace OnlineRadio.Core
                     OnStreamOver?.Invoke(this, new StreamOverEventArgs());
                 }
             } while (Running);
-        }
-
-        async Task<string> GetStreamUrlFromM3U(string streamUrl)
-        {
-            var result = await httpClient.GetStringAsync(streamUrl);
-
-            var lines = result.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
-
-            if (lines.Length == 0)
-                throw new ArgumentException($"The specified m3u url points to an empty file");
-
-            if (lines.First() == "#EXTM3U")
-                throw new NotSupportedException("Extended m3u files are not supported");
-
-            foreach(var line in lines)
-            {
-                // Skip comments
-                if (line.StartsWith('#'))
-                    continue;
-
-                // The first line that is not a comment is the mp3 url
-                return line;
-            }
-
-            throw new InvalidDataException("The specified m3u points to a document with no stream url");
         }
 
         void UpdateCurrentSong(object sender, MetadataEventArgs args)
@@ -300,6 +262,7 @@ namespace OnlineRadio.Core
 
             Running = false;
             OnCurrentSongChanged -= pluginManager.OnCurrentSongChanged;
+            OnStreamStart -= pluginManager.OnStreamStart;
             OnStreamUpdate -= pluginManager.OnStreamUpdate;
             OnStreamOver -= pluginManager.OnStreamOver;
             pluginManager.Dispose();
@@ -356,6 +319,15 @@ namespace OnlineRadio.Core
         {
             this.OldSong = OldSong;
             this.NewSong = NewSong;
+        }
+    }
+
+    public class StreamStartEventArgs : EventArgs
+    {
+        public string Codec { get; private set; }
+        public StreamStartEventArgs(string codec)
+        {
+            this.Codec = codec;
         }
     }
 

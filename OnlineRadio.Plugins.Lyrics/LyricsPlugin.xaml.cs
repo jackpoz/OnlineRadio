@@ -67,7 +67,7 @@ namespace OnlineRadio.Plugins.Lyrics
             {
                 try
                 {
-                    var response = await GetResponse(string.Format(lyricsUrl, args.NewSong.Title, args.NewSong.Artist));
+                    var response = await GetResponse(string.Format(lyricsUrl, args.NewSong.Title, args.NewSong.Artist)).ConfigureAwait(false);
                     JObject json = JObject.Parse(response);
                     if ((string)json["message"]["header"]["status_code"] == "401")
                         SetLyrics("Unathorized call to Lyrics API, please check \"apikey\" parameter in the plugin config file."
@@ -80,6 +80,11 @@ namespace OnlineRadio.Plugins.Lyrics
                     SetLyrics("Lyrics not found");
                 }
             });
+        }
+
+        public void OnStreamStart(object sender, StreamStartEventArgs args)
+        {
+            // Do nothing
         }
 
         public void OnStreamUpdate(object sender, StreamUpdateEventArgs args)
@@ -101,7 +106,7 @@ namespace OnlineRadio.Plugins.Lyrics
         async Task<string> GetResponse(string url)
         {
             url += "&apikey=" + ApiKey;
-            return await httpClient.GetStringAsync(url);
+            return await httpClient.GetStringAsync(url).ConfigureAwait(false);
         }
     }
 }
