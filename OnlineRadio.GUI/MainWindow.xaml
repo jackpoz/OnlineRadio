@@ -50,7 +50,7 @@
             <TaskbarItemInfo.ThumbButtonInfos>
                 <ThumbButtonInfoCollection>
                     <ThumbButtonInfo Click="StopSourceBtn_Click" ImageSource="Resources/stop.png" />
-                    <ThumbButtonInfo Click="PlaySourceBtn_Click" ImageSource="Resources/play.png" />
+                    <ThumbButtonInfo x:Name="PlaySourceThumbBtn" Click="PlaySourceBtn_Click" ImageSource="Resources/play.png" />
                 </ThumbButtonInfoCollection>
             </TaskbarItemInfo.ThumbButtonInfos>
         </TaskbarItemInfo>

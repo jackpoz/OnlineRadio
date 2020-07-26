@@ -22,6 +22,19 @@ namespace OnlineRadio.GUI
         Radio radio;
         const string windowTitle = "OnlineRadio";
 
+        private bool CanPlay
+        {
+            get
+            {
+                return PlaySourceBtn.IsEnabled && PlaySourceThumbBtn.IsEnabled;
+            }
+            set
+            {
+                PlaySourceBtn.IsEnabled = value;
+                PlaySourceThumbBtn.IsEnabled = value;
+            }
+        }
+
         public MainWindow()
         {
             InitializeComponent();
@@ -58,12 +71,22 @@ namespace OnlineRadio.GUI
 
         private async void PlaySourceBtn_Click(object sender, RoutedEventArgs e)
         {
+            if (!CanPlay)
+                return;
+
+            CanPlay = false;
             await PlaySource();
+            CanPlay = true;
         }
 
         private async void PlaySourceBtn_Click(object sender, EventArgs e)
         {
+            if (!CanPlay)
+                return;
+
+            CanPlay = false;
             await PlaySource();
+            CanPlay = true;
         }
 
         private async Task PlaySource()
@@ -118,12 +141,16 @@ namespace OnlineRadio.GUI
 
         private async void StopSourceBtn_Click(object sender, RoutedEventArgs e)
         {
+            CanPlay = false;
             await StopPlaying();
+            CanPlay = true;
         }
 
         private async void StopSourceBtn_Click(object sender, EventArgs e)
         {
+            CanPlay = false;
             await StopPlaying();
+            CanPlay = true;
         }
 
         private async Task StopPlaying()
