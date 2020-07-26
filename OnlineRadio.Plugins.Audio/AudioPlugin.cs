@@ -149,25 +149,7 @@ namespace OnlineRadio.Plugins.Audio
             {
                 try
                 {
-                    //StreamBuffer empty, taking a break
-                    if (stream.Length < 16384 / 4)
-                    {
-                        await Task.Delay(500).ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        if (mediaReader == null)
-                            mediaReader = new StreamMediaFoundationReader(stream);
-
-                        if (waveOut == null)
-                        {
-                            waveOut = new WaveOutEvent();
-                            VolumeWaveProvider16 volumeProvider = new VolumeWaveProvider16(mediaReader);
-                            volumeProvider.Volume = 0.5f;
-                            waveOut.Init(volumeProvider);
-                            waveOut.Play();
-                        }
-                    }
+                    throw new NotImplementedException();
                 }
                 catch (EndOfStreamException)
                 {
