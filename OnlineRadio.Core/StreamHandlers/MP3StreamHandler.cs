@@ -48,7 +48,7 @@ namespace OnlineRadio.Core.StreamHandlers
 
         public override async Task<(int bytesRead, byte[] buffer)> ReadAsync()
         {
-            var bytesRead = await Task.Run(() => socketStream.Read(buffer, 0, buffer.Length)).ConfigureAwait(false);
+            var bytesRead = await socketStream.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
 
             return (bytesRead, buffer);
         }
