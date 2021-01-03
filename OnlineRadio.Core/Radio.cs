@@ -128,8 +128,8 @@ namespace OnlineRadio.Core
             {
                 try
                 {
-                    using var streamHandler = await BaseStreamHandler.GetStreamHandler(Url, httpClient).ConfigureAwait(false);
-                    await streamHandler.StartAsync().ConfigureAwait(false);
+                    using var streamHandler = await BaseStreamHandler.GetStreamHandler(Url, httpClient);
+                    await streamHandler.StartAsync();
                     {
                         //get the position of metadata
                         int metaInt = streamHandler.GetIceCastMetaInterval();
@@ -147,7 +147,7 @@ namespace OnlineRadio.Core
                         {                            
                             if (bufferPosition >= readBytes)
                             {
-                                (readBytes, buffer) = await streamHandler.ReadAsync().ConfigureAwait(false);
+                                (readBytes, buffer) = await streamHandler.ReadAsync();
                                 bufferPosition = 0;
                             }
                             if (readBytes <= 0)
