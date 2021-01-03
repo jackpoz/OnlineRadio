@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OnlineRadio.Core.StreamHandlers
@@ -48,7 +49,8 @@ namespace OnlineRadio.Core.StreamHandlers
 
         public override async Task<(int bytesRead, byte[] buffer)> ReadAsync()
         {
-            var bytesRead = await socketStream.ReadAsync(buffer, 0, buffer.Length);
+            using var tokenSource = new CancellationTokenSource(10000);
+            var bytesRead = await socketStream.ReadAsync(buffer, tokenSource.Token);
 
             return (bytesRead, buffer);
         }
