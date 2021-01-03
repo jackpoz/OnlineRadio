@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProductVersion>8.0.30703</ProductVersion>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <AssemblyTitle>OnlineRadio.Plugins.Lyrics</AssemblyTitle>
     <Product>OnlineRadio.Plugins.Lyrics</Product>
     <Copyright>Copyright ©  2012</Copyright>
