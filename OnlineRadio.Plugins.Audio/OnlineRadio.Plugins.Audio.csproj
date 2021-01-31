@@ -8,12 +8,12 @@
     <DebugType>full</DebugType>
     <OutputPath>..\OnlineRadio.GUI\bin\$(Configuration)\plugins\</OutputPath>
     <DebugSymbols>true</DebugSymbols>
+    <UseWPF>true</UseWPF>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NAudio" Version="1.10.0" />
-    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OnlineRadio.Core\OnlineRadio.Core.csproj">
