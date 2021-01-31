@@ -4,26 +4,26 @@
         Width="500" Height="500" Closed="Window_Closed" MinWidth="406" MinHeight="160">
     <DockPanel>
         <StackPanel DockPanel.Dock="Top">
-            <StackPanel Name="ManageSourcesPanel" Height="28" HorizontalAlignment="Left" Orientation="Horizontal" VerticalAlignment="Top">
+            <WrapPanel Name="ManageSourcesPanel" HorizontalAlignment="Left" Orientation="Horizontal" VerticalAlignment="Top">
                 <ComboBox Name="SelectSourceCombo" HorizontalAlignment="Left" Width="200"/>
-                <Button Name="PlaySourceBtn" Width="28" Margin="10,0,0,0" FontFamily="Segoe UI Symbol" Click="PlaySourceBtn_Click">
+                <Button Name="PlaySourceBtn" Height="28" Width="28" Margin="10,0,0,0" FontFamily="Segoe UI Symbol" Click="PlaySourceBtn_Click">
                     &#xE102;
                 </Button>
-                <Button Name="StopSourceBtn" Width="28" Margin="10,0,0,0" FontFamily="Segoe UI Symbol" Click="StopSourceBtn_Click">
+                <Button Name="StopSourceBtn" Height="28" Width="28" Margin="10,0,0,0" FontFamily="Segoe UI Symbol" Click="StopSourceBtn_Click">
                     &#xE15B;
                 </Button>
-                <Button Name="AddSourceBtn" Width="28" Margin="10,0,0,0" FontFamily="Segoe UI Symbol" Click="AddSourceBtn_Click">
+                <Button Name="AddSourceBtn" Height="28" Width="28" Margin="10,0,0,0" FontFamily="Segoe UI Symbol" Click="AddSourceBtn_Click">
                     &#xE109;
                 </Button>
-                <Button Name="EditSourceBtn" Width="28" Margin="10,0,0,0" FontFamily="Segoe UI Symbol" Click="EditSourceBtn_Click">
+                <Button Name="EditSourceBtn" Height="28" Width="28" Margin="10,0,0,0" FontFamily="Segoe UI Symbol" Click="EditSourceBtn_Click">
                     &#xE104;
                 </Button>
-                <Button Name="RemoveSourceBtn" Width="28" Margin="10,0,0,0" FontFamily="Segoe UI Symbol" Click="RemoveSourceBtn_Click">
+                <Button Name="RemoveSourceBtn" Height="28" Width="28" Margin="10,0,0,0" FontFamily="Segoe UI Symbol" Click="RemoveSourceBtn_Click">
                     &#xE108;
                 </Button>
-                <StackPanel Name="ButtonPluginsPanel" Height="28" HorizontalAlignment="Left" Orientation="Horizontal" VerticalAlignment="Top">                    
-                </StackPanel>
-            </StackPanel>
+                <WrapPanel Name="ButtonPluginsPanel" Height="28" HorizontalAlignment="Left" Orientation="Horizontal" VerticalAlignment="Top">
+                </WrapPanel>
+            </WrapPanel>
             <StackPanel Name="InfoPanel">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock xml:space="preserve">Title: </TextBlock>
