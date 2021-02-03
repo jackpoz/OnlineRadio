@@ -28,9 +28,9 @@ namespace OnlineRadio.Plugins.SongPreferences
             set
             {
                 if (value)
-                    FavouriteSongBtn.Content = "\uE195";
+                    FavouriteSongBtn.Content = "\uE1CF";
                 else
-                    FavouriteSongBtn.Content = "\uE113";
+                    FavouriteSongBtn.Content = "\uE1CE";
                 _isCurrentSongFavourite = value;
             }
         }

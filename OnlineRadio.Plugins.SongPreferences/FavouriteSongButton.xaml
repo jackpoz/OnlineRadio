@@ -7,6 +7,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="28" d:DesignWidth="28">
     <Button Name="FavouriteSongBtn" Height="28" Width="28" FontFamily="Segoe UI Symbol" Click="FavouriteSongBtn_Click">
-        &#xE113;
+        &#xE1CE;
     </Button>
 </UserControl>
