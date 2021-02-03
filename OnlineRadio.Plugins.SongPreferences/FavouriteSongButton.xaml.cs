@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static OnlineRadio.Plugins.SongPreferences.SongPreference;
 
 namespace OnlineRadio.Plugins.SongPreferences
 {
@@ -18,7 +19,7 @@ namespace OnlineRadio.Plugins.SongPreferences
     /// </summary>
     public partial class FavouriteSongButton : UserControl
     {
-        public bool IsCurrentSongFavourite
+        bool IsCurrentSongFavourite
         {
             get
             {
@@ -35,15 +36,25 @@ namespace OnlineRadio.Plugins.SongPreferences
         }
         bool _isCurrentSongFavourite;
 
+        public EventHandler<SongPreferenceEventArgs> OnSongPreferenceChanged;
 
         public FavouriteSongButton()
         {
             InitializeComponent();
         }
 
+        public void SetCurrentSongFavourite(bool favourite)
+        {
+            Dispatcher.InvokeAsync(() =>
+            {
+                IsCurrentSongFavourite = favourite;
+            });
+        }
+
         private void FavouriteSongBtn_Click(object sender, RoutedEventArgs e)
         {
             IsCurrentSongFavourite = !IsCurrentSongFavourite;
+            OnSongPreferenceChanged?.Invoke(this, new SongPreferenceEventArgs(IsCurrentSongFavourite ? ESongPref.Favourite : ESongPref.None));
         }
     }
 }

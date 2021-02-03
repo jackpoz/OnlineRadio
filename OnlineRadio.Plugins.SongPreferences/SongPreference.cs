@@ -24,6 +24,16 @@ namespace OnlineRadio.Plugins.SongPreferences
             set;
         }
 
+        public SongPreference()
+        { }
+
+        public SongPreference(string artist, string title, ESongPref preference)
+        {
+            this.Artist = artist;
+            this.Title = title;
+            this.Preference = preference;
+        }
+
         public enum ESongPref
         {
             None = 0,
