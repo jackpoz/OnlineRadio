@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OnlineRadio.GUI", "OnlineRa
 		{5CBFAA75-D27E-45CE-9063-793DED2225C6} = {5CBFAA75-D27E-45CE-9063-793DED2225C6}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineRadio.Plugins.SongPreferences", "OnlineRadio.Plugins.SongPreferences\OnlineRadio.Plugins.SongPreferences.csproj", "{B64E3B84-5A84-4E5B-8550-CEC4480AE44D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,18 @@ Global
 		{68EF0C27-7FB5-42B8-A333-91182C7ADC60}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{68EF0C27-7FB5-42B8-A333-91182C7ADC60}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{68EF0C27-7FB5-42B8-A333-91182C7ADC60}.Release|x86.ActiveCfg = Release|Any CPU
+		{B64E3B84-5A84-4E5B-8550-CEC4480AE44D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B64E3B84-5A84-4E5B-8550-CEC4480AE44D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B64E3B84-5A84-4E5B-8550-CEC4480AE44D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B64E3B84-5A84-4E5B-8550-CEC4480AE44D}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B64E3B84-5A84-4E5B-8550-CEC4480AE44D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B64E3B84-5A84-4E5B-8550-CEC4480AE44D}.Debug|x86.Build.0 = Debug|Any CPU
+		{B64E3B84-5A84-4E5B-8550-CEC4480AE44D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B64E3B84-5A84-4E5B-8550-CEC4480AE44D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B64E3B84-5A84-4E5B-8550-CEC4480AE44D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{B64E3B84-5A84-4E5B-8550-CEC4480AE44D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{B64E3B84-5A84-4E5B-8550-CEC4480AE44D}.Release|x86.ActiveCfg = Release|Any CPU
+		{B64E3B84-5A84-4E5B-8550-CEC4480AE44D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

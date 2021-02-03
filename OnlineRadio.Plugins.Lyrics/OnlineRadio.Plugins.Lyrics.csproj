@@ -9,8 +9,8 @@
     <OutputPath>..\OnlineRadio.GUI\bin\$(Configuration)\plugins\</OutputPath>
     <DebugSymbols>true</DebugSymbols>
     <UseWPF>true</UseWPF>
-	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	  <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+	  <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\OnlineRadio.Core\OnlineRadio.Core.csproj">
