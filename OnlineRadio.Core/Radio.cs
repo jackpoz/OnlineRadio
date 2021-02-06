@@ -83,6 +83,8 @@ namespace OnlineRadio.Core
 
         public event EventHandler<StreamOverEventArgs> OnStreamOver;
 
+        public event EventHandler<VolumeUpdateEventArgs> OnVolumeUpdate;
+
         public event EventHandler<PluginEventArgs> OnPluginsLoaded;
 
         public static event EventHandler<MessageLogEventArgs> OnMessageLogged;
@@ -345,6 +347,16 @@ namespace OnlineRadio.Core
     {
         public StreamOverEventArgs()
         {
+        }
+    }
+
+    public class VolumeUpdateEventArgs : EventArgs
+    {
+        public float Volume { get; private set; }
+
+        public VolumeUpdateEventArgs(float Volume)
+        {
+            this.Volume = Volume;
         }
     }
 

@@ -14,6 +14,8 @@
         void OnStreamUpdate(object sender, StreamUpdateEventArgs args);
 
         void OnStreamOver(object sender, StreamOverEventArgs args);
+
+        void OnVolumeUpdate(object sender, VolumeUpdateEventArgs args);
     }
 
     public abstract class BasePlugin : IPlugin
@@ -42,6 +44,11 @@
         }
 
         public void OnStreamOver(object sender, StreamOverEventArgs args)
+        {
+            // Do nothing
+        }
+
+        public void OnVolumeUpdate(object sender, VolumeUpdateEventArgs args)
         {
             // Do nothing
         }
