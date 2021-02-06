@@ -63,6 +63,10 @@ namespace OnlineRadio.Plugins.SongPreferences
         {
         }
 
+        void IPlugin.OnVolumeUpdate(object sender, VolumeUpdateEventArgs args)
+        {
+        }
+
         void OnSongPreferenceChanged(object sender, SongPreferenceEventArgs args)
         {
             var preference = songPreferences.FirstOrDefault(s => s.Artist == _currentSong.Artist && s.Title == _currentSong.Title);

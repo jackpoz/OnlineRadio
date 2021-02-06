@@ -61,7 +61,7 @@ namespace OnlineRadio.Plugins.Lyrics
         }
         string _apikey;
 
-        public void OnCurrentSongChanged(object sender, CurrentSongEventArgs args)
+        void IPlugin.OnCurrentSongChanged(object sender, CurrentSongEventArgs args)
         {
             Task.Run(async () =>
             {
@@ -82,17 +82,22 @@ namespace OnlineRadio.Plugins.Lyrics
             });
         }
 
-        public void OnStreamStart(object sender, StreamStartEventArgs args)
+        void IPlugin.OnStreamStart(object sender, StreamStartEventArgs args)
         {
             // Do nothing
         }
 
-        public void OnStreamUpdate(object sender, StreamUpdateEventArgs args)
+        void IPlugin.OnStreamUpdate(object sender, StreamUpdateEventArgs args)
         {
             // Do nothing
         }
 
-        public void OnStreamOver(object sender, StreamOverEventArgs args)
+        void IPlugin.OnStreamOver(object sender, StreamOverEventArgs args)
+        {
+            // Do nothing
+        }
+
+        void IPlugin.OnVolumeUpdate(object sender, VolumeUpdateEventArgs args)
         {
             // Do nothing
         }

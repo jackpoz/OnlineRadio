@@ -33,27 +33,32 @@ namespace OnlineRadio.Plugins.Audio
             stream = new SlidingStream();
         }
 
-        public void OnCurrentSongChanged(object sender, CurrentSongEventArgs args)
+        void IPlugin.OnCurrentSongChanged(object sender, CurrentSongEventArgs args)
         {
             // Do nothing
         }
 
-        public void OnStreamStart(object sender, StreamStartEventArgs args)
+        void IPlugin.OnStreamStart(object sender, StreamStartEventArgs args)
         {
             Codec = args.Codec;
         }
 
-        public void OnStreamUpdate(object sender, StreamUpdateEventArgs args)
+        void IPlugin.OnStreamUpdate(object sender, StreamUpdateEventArgs args)
         {
             stream.Write(args.Data, 0, args.Data.Length);
             if (!IsPlaying)
                 StartPlay();
         }
 
-        public void OnStreamOver(object sender, StreamOverEventArgs args)
+        void IPlugin.OnStreamOver(object sender, StreamOverEventArgs args)
         {
             IsPlaying = false;
             playTask?.Wait();
+        }
+
+        void IPlugin.OnVolumeUpdate(object sender, VolumeUpdateEventArgs args)
+        {
+            // Do nothing
         }
 
         void StartPlay()
