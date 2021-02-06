@@ -14,6 +14,7 @@ namespace OnlineRadio.Plugins.SongPreferences
     public sealed class SongPreferencesPlugin : IButtonPlugin, IDisposable
     {
         const string preferencesPath = "songPreferences.xml";
+        const float favouriteVolumeModifier = 3f;
 
         ConcurrentBag<SongPreference> songPreferences;
 
@@ -44,19 +45,49 @@ namespace OnlineRadio.Plugins.SongPreferences
         }
         FavouriteSongButton _button;
         SongInfo _currentSong;
+        ESongPref CurrentSongPreference
+        {
+            get
+            {
+                return _currentSongPreference;
+            }
+            set
+            {
+                if (_currentSongPreference == value)
+                    return;
+                if (_currentSongPreference == ESongPref.None && value == ESongPref.Favourite)
+                {
+                    if (_radio != null)
+                        _radio.Volume *= favouriteVolumeModifier;
+                }
+                else if (_currentSongPreference == ESongPref.Favourite && value == ESongPref.None)
+                {
+                    if (_radio != null)
+                        _radio.Volume /= favouriteVolumeModifier;
+                }
+                _currentSongPreference = value;
+            }
+        }
+        ESongPref _currentSongPreference;
+        Radio _radio;
 
         void IPlugin.OnCurrentSongChanged(object sender, CurrentSongEventArgs args)
         {
             _currentSong = args.NewSong;
-            _button.SetCurrentSongFavourite(songPreferences.Any(s => s.Artist == _currentSong.Artist && s.Title == _currentSong.Title && s.Preference == SongPreference.ESongPref.Favourite));
+            var newSongPreference = songPreferences.FirstOrDefault(s => s.Artist == _currentSong.Artist && s.Title == _currentSong.Title)?.Preference ?? ESongPref.None;
+            _button.SetCurrentSongFavourite(newSongPreference == SongPreference.ESongPref.Favourite);
+
+            CurrentSongPreference = newSongPreference;
         }
 
         void IPlugin.OnStreamOver(object sender, StreamOverEventArgs args)
         {
+            _radio = null;
         }
 
         void IPlugin.OnStreamStart(object sender, StreamStartEventArgs args)
         {
+            _radio = sender as Radio;
         }
 
         void IPlugin.OnStreamUpdate(object sender, StreamUpdateEventArgs args)
@@ -69,11 +100,18 @@ namespace OnlineRadio.Plugins.SongPreferences
 
         void OnSongPreferenceChanged(object sender, SongPreferenceEventArgs args)
         {
+            if (_currentSong == null)
+            {
+                args.CancelEvent = true;
+                return;
+            }
+
             var preference = songPreferences.FirstOrDefault(s => s.Artist == _currentSong.Artist && s.Title == _currentSong.Title);
             if (preference != null)
                 preference.Preference = args.Preference;
             else
                 songPreferences.Add(new SongPreference(_currentSong.Artist, _currentSong.Title, args.Preference));
+            CurrentSongPreference = args.Preference;
         }
 
         public void Dispose()
@@ -89,6 +127,7 @@ namespace OnlineRadio.Plugins.SongPreferences
     public class SongPreferenceEventArgs : EventArgs
     {
         public ESongPref Preference { get; private set; }
+        public bool CancelEvent { get; set; }
 
         public SongPreferenceEventArgs(ESongPref Preference)
         {

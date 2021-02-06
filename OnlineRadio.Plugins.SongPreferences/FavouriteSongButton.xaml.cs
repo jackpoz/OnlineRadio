@@ -53,8 +53,10 @@ namespace OnlineRadio.Plugins.SongPreferences
 
         private void FavouriteSongBtn_Click(object sender, RoutedEventArgs e)
         {
-            IsCurrentSongFavourite = !IsCurrentSongFavourite;
-            OnSongPreferenceChanged?.Invoke(this, new SongPreferenceEventArgs(IsCurrentSongFavourite ? ESongPref.Favourite : ESongPref.None));
+            var args = new SongPreferenceEventArgs(!IsCurrentSongFavourite ? ESongPref.Favourite : ESongPref.None);
+            OnSongPreferenceChanged?.Invoke(this, args);
+            if (!args.CancelEvent)
+                IsCurrentSongFavourite = !IsCurrentSongFavourite;
         }
     }
 }

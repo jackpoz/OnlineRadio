@@ -28,6 +28,21 @@ namespace OnlineRadio.Plugins.Audio
             set;
         }
 
+        float Volume
+        {
+            get
+            {
+                return _volume;
+            }
+            set
+            {
+                _volume = value;
+                if (waveOut != null)
+                    waveOut.Volume = Math.Clamp(value, 0f, 1f);
+            }
+        }
+        float _volume;
+
         public AudioPlugin()
         {
             stream = new SlidingStream();
@@ -41,6 +56,7 @@ namespace OnlineRadio.Plugins.Audio
         void IPlugin.OnStreamStart(object sender, StreamStartEventArgs args)
         {
             Codec = args.Codec;
+            _volume = (sender as Radio)?.Volume ?? 0f;
         }
 
         void IPlugin.OnStreamUpdate(object sender, StreamUpdateEventArgs args)
@@ -58,7 +74,7 @@ namespace OnlineRadio.Plugins.Audio
 
         void IPlugin.OnVolumeUpdate(object sender, VolumeUpdateEventArgs args)
         {
-            // Do nothing
+            Volume = args.Volume;
         }
 
         void StartPlay()
@@ -129,7 +145,7 @@ namespace OnlineRadio.Plugins.Audio
                         {
                             waveOut = new WaveOutEvent();
                             VolumeWaveProvider16 volumeProvider = new VolumeWaveProvider16(bufferedWaveProvider);
-                            volumeProvider.Volume = 0.5f;
+                            volumeProvider.Volume = Volume;
                             waveOut.Init(volumeProvider);
                             waveOut.Play();
                         }

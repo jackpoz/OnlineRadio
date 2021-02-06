@@ -83,6 +83,19 @@ namespace OnlineRadio.Core
 
         public event EventHandler<StreamOverEventArgs> OnStreamOver;
 
+        public float Volume
+        {
+            get
+            {
+                return _volume;
+            }
+            set
+            {
+                OnVolumeUpdate?.Invoke(this, new VolumeUpdateEventArgs(value));
+                _volume = value;
+            }
+        }
+        float _volume = 0.25f;
         public event EventHandler<VolumeUpdateEventArgs> OnVolumeUpdate;
 
         public event EventHandler<PluginEventArgs> OnPluginsLoaded;
@@ -120,6 +133,7 @@ namespace OnlineRadio.Core
             OnStreamStart += pluginManager.OnStreamStart;
             OnStreamUpdate += pluginManager.OnStreamUpdate;
             OnStreamOver += pluginManager.OnStreamOver;
+            OnVolumeUpdate += pluginManager.OnVolumeUpdate;
             Running = true;
             runningTask = Task.Run(GetHttpStreamAsync);
         }
@@ -327,6 +341,7 @@ namespace OnlineRadio.Core
     public class StreamStartEventArgs : EventArgs
     {
         public string Codec { get; private set; }
+
         public StreamStartEventArgs(string codec)
         {
             this.Codec = codec;
