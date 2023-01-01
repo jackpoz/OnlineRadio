@@ -31,7 +31,7 @@ namespace OnlineRadio.Plugins.Audio
                 {
                     _buttons = new List<UserControl>()
                     {
-                        new DecreaseVolumeButton(),
+                        new DecreaseVolumeButton(_radio),
                         new IncreaseVolumeButton(_radio),
                         //new MuteUnmuteVolumeButton()
                     };
@@ -60,8 +60,8 @@ namespace OnlineRadio.Plugins.Audio
             set
             {
                 _volume = value;
-                if (waveOut != null)
-                    waveOut.Volume = value;
+                if (volumeProvider != null)
+                    volumeProvider.Volume = value;
             }
         }
         float _volume;
@@ -120,6 +120,7 @@ namespace OnlineRadio.Plugins.Audio
         #region NAudio
         readonly SlidingStream stream;
         IWavePlayer waveOut;
+        VolumeWaveProvider16 volumeProvider;
         IMp3FrameDecompressor decompressor;
         BufferedWaveProvider bufferedWaveProvider;
         StreamMediaFoundationReader mediaReader;
@@ -168,7 +169,7 @@ namespace OnlineRadio.Plugins.Audio
                         if (waveOut == null)
                         {
                             waveOut = new WaveOutEvent();
-                            VolumeWaveProvider16 volumeProvider = new VolumeWaveProvider16(bufferedWaveProvider);
+                            volumeProvider = new VolumeWaveProvider16(bufferedWaveProvider);
                             volumeProvider.Volume = Volume;
                             waveOut.Init(volumeProvider);
                             waveOut.Play();
@@ -211,6 +212,8 @@ namespace OnlineRadio.Plugins.Audio
 
         private void CleanUpAudio()
         {
+            volumeProvider = null;
+
             if (waveOut != null)
             {
                 waveOut.Stop();

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OnlineRadio.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,14 +21,18 @@ namespace OnlineRadio.Plugins.Audio
     /// </summary>
     public partial class DecreaseVolumeButton : UserControl
     {
-        public DecreaseVolumeButton()
+        Radio _radio;
+
+        public DecreaseVolumeButton(Radio radio)
         {
+            _radio = radio;
+
             InitializeComponent();
         }
 
         private void ChangeVolumeBtn_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Not implemented yet");
+            _radio.Volume -= 0.1f;
         }
     }
 }

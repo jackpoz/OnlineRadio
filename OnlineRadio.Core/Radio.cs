@@ -95,7 +95,7 @@ namespace OnlineRadio.Core
                 OnVolumeUpdate?.Invoke(this, new VolumeUpdateEventArgs(_volume));
             }
         }
-        float _volume = 0.25f;
+        float _volume = 0.2f;
         public event EventHandler<VolumeUpdateEventArgs> OnVolumeUpdate;
 
         public event EventHandler<PluginEventArgs> OnPluginsLoaded;
