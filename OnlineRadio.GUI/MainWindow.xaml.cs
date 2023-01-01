@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -218,8 +219,7 @@ namespace OnlineRadio.GUI
 
             foreach (IPlugin plugin in e.Plugins)
 	        {
-                var visualPlugin = plugin as IVisualPlugin;
-                if (visualPlugin != null)
+                if (plugin is IVisualPlugin visualPlugin)
                 {
                     Point freeCell = cells.GetFreeCell(visualPlugin.ColumnSpan);
                     if (freeCell.Y >= PluginsGrid.RowDefinitions.Count)

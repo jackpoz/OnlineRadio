@@ -32,7 +32,7 @@ namespace OnlineRadio.Plugins.Audio
                     _buttons = new List<UserControl>()
                     {
                         new DecreaseVolumeButton(),
-                        new IncreaseVolumeButton(),
+                        new IncreaseVolumeButton(_radio),
                         //new MuteUnmuteVolumeButton()
                     };
                 }
@@ -43,14 +43,32 @@ namespace OnlineRadio.Plugins.Audio
 
         Task playTask;
 
+        Radio _radio;
+
         string Codec
         {
             get;
             set;
         }
 
-        public AudioPlugin()
+        float Volume
         {
+            get
+            {
+                return _volume;
+            }
+            set
+            {
+                _volume = value;
+                if (waveOut != null)
+                    waveOut.Volume = value;
+            }
+        }
+        float _volume;
+
+        public AudioPlugin(Radio radio)
+        {
+            _radio = radio;
             stream = new SlidingStream();
         }
 
@@ -62,6 +80,7 @@ namespace OnlineRadio.Plugins.Audio
         void IPlugin.OnStreamStart(object sender, StreamStartEventArgs args)
         {
             Codec = args.Codec;
+            _volume = _radio.Volume;
         }
 
         void IPlugin.OnStreamUpdate(object sender, StreamUpdateEventArgs args)
@@ -79,7 +98,7 @@ namespace OnlineRadio.Plugins.Audio
 
         void IPlugin.OnVolumeUpdate(object sender, VolumeUpdateEventArgs args)
         {
-            // Do nothing
+            Volume = args.Volume;
         }
 
         void StartPlay()
@@ -150,7 +169,7 @@ namespace OnlineRadio.Plugins.Audio
                         {
                             waveOut = new WaveOutEvent();
                             VolumeWaveProvider16 volumeProvider = new VolumeWaveProvider16(bufferedWaveProvider);
-                            volumeProvider.Volume = 0.5f;
+                            volumeProvider.Volume = Volume;
                             waveOut.Init(volumeProvider);
                             waveOut.Play();
                         }
