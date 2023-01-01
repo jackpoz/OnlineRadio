@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="OnlineRadio.Plugins.Audio.VolumeButton"
+﻿<UserControl x:Class="OnlineRadio.Plugins.Audio.IncreaseVolumeButton"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -7,6 +7,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="28" d:DesignWidth="28">
     <Button Name="ChangeVolumeBtn" Height="28" Width="28" FontFamily="Segoe UI Symbol" Click="ChangeVolumeBtn_Click" >
-        &#xE247;
+        &#x1F50A;
     </Button>
 </UserControl>

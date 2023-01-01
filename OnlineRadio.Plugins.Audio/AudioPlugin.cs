@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
 using System.Windows.Controls;
+using System.Collections.Generic;
 
 namespace OnlineRadio.Plugins.Audio
 {
@@ -22,16 +23,23 @@ namespace OnlineRadio.Plugins.Audio
             set;
         }
 
-        public UserControl Button
+        public IEnumerable<UserControl> Buttons
         {
             get
             {
-                if (_button == null)
-                    _button = new VolumeButton();
-                return _button;
+                if (_buttons == null)
+                {
+                    _buttons = new List<UserControl>()
+                    {
+                        new DecreaseVolumeButton(),
+                        new IncreaseVolumeButton(),
+                        //new MuteUnmuteVolumeButton()
+                    };
+                }
+                return _buttons;
             }
         }
-        UserControl _button;
+        List<UserControl> _buttons;
 
         Task playTask;
 

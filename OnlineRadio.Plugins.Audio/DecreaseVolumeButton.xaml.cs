@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace OnlineRadio.Plugins.Audio
 {
     /// <summary>
-    /// Interaction logic for VolumeButton.xaml
+    /// Interaction logic for DecreaseVolumeButton.xaml
     /// </summary>
-    public partial class VolumeButton : UserControl
+    public partial class DecreaseVolumeButton : UserControl
     {
-        public VolumeButton()
+        public DecreaseVolumeButton()
         {
             InitializeComponent();
         }

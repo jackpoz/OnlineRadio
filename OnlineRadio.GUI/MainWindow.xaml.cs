@@ -232,9 +232,11 @@ namespace OnlineRadio.GUI
 
                 if (plugin is IButtonPlugin buttonPlugin)
                 {
-                    var button = buttonPlugin.Button;
-                    button.Margin = new Thickness(10, 0, 0, 0);
-                    ButtonPluginsPanel.Children.Add(button);
+                    foreach (var button in buttonPlugin.Buttons)
+                    {
+                        button.Margin = new Thickness(10, 0, 0, 0);
+                        ButtonPluginsPanel.Children.Add(button);
+                    }
                 }
 	        }
         }
