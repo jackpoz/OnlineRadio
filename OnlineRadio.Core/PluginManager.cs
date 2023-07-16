@@ -12,7 +12,7 @@ namespace OnlineRadio.Core
 
         string path;
 
-        public List<IPlugin> LoadPlugins(string path)
+        public List<IPlugin> LoadPlugins(string path, Radio radio)
         {
             this.path = path;
             DirectoryInfo dir = new DirectoryInfo(path);
@@ -30,7 +30,7 @@ namespace OnlineRadio.Core
                             !type.IsAbstract &&
                             pluginType.IsAssignableFrom(type))
                         {
-                            IPlugin plugin = (IPlugin)Activator.CreateInstance(type);
+                            IPlugin plugin = TryCreateInstance(type, radio) ?? TryCreateInstance(type);
                             plugins.Add(plugin);
                         }
                     }
@@ -44,6 +44,18 @@ namespace OnlineRadio.Core
             return plugins;
         }
 
+        IPlugin TryCreateInstance(Type type, params object[] args)
+        {
+            try
+            {
+                return (IPlugin)Activator.CreateInstance(type, args);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public void UnloadPlugins()
         {
             foreach (var plugin in plugins)
@@ -53,12 +65,6 @@ namespace OnlineRadio.Core
                     disposablePlugin.Dispose();
             }
             plugins.Clear();
-        }
-
-        public void ReloadPlugins()
-        {
-            UnloadPlugins();
-            LoadPlugins(path);
         }
 
         public void Dispose()
@@ -88,6 +94,12 @@ namespace OnlineRadio.Core
         {
             foreach (var plugin in plugins)
                 plugin.OnStreamOver(sender, args);
+        }
+
+        public void OnVolumeUpdate(object sender, VolumeUpdateEventArgs args)
+        {
+            foreach (var plugin in plugins)
+                plugin.OnVolumeUpdate(sender, args);
         }
     }
 }

@@ -9,6 +9,6 @@ namespace OnlineRadio.Core
 {
     public interface IButtonPlugin : IPlugin
     {
-        UserControl Button { get; }
+        IEnumerable<UserControl> Buttons { get; }
     }
 }

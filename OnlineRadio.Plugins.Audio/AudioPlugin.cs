@@ -5,12 +5,14 @@ using NAudio.Wave;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
+using System.Windows.Controls;
+using System.Collections.Generic;
 
 namespace OnlineRadio.Plugins.Audio
 {
-    public sealed class AudioPlugin : IPlugin, IDisposable
+    public sealed class AudioPlugin : IButtonPlugin, IPlugin, IDisposable
     {
-        public string Name
+        string IPlugin.Name
         {
             get { return "AudioPlugin"; }
         }
@@ -20,7 +22,28 @@ namespace OnlineRadio.Plugins.Audio
             get;
             set;
         }
+
+        IEnumerable<UserControl> IButtonPlugin.Buttons
+        {
+            get
+            {
+                if (_buttons == null)
+                {
+                    _buttons = new List<UserControl>()
+                    {
+                        new DecreaseVolumeButton(_radio),
+                        new IncreaseVolumeButton(_radio),
+                        //new MuteUnmuteVolumeButton()
+                    };
+                }
+                return _buttons;
+            }
+        }
+        List<UserControl> _buttons;
+
         Task playTask;
+
+        Radio _radio;
 
         string Codec
         {
@@ -28,32 +51,54 @@ namespace OnlineRadio.Plugins.Audio
             set;
         }
 
-        public AudioPlugin()
+        float Volume
         {
+            get
+            {
+                return _volume;
+            }
+            set
+            {
+                _volume = value;
+                if (volumeProvider != null)
+                    volumeProvider.Volume = value;
+            }
+        }
+        float _volume;
+
+        public AudioPlugin(Radio radio)
+        {
+            _radio = radio;
             stream = new SlidingStream();
         }
 
-        public void OnCurrentSongChanged(object sender, CurrentSongEventArgs args)
+        void IPlugin.OnCurrentSongChanged(object sender, CurrentSongEventArgs args)
         {
             // Do nothing
         }
 
-        public void OnStreamStart(object sender, StreamStartEventArgs args)
+        void IPlugin.OnStreamStart(object sender, StreamStartEventArgs args)
         {
             Codec = args.Codec;
+            _volume = _radio.Volume;
         }
 
-        public void OnStreamUpdate(object sender, StreamUpdateEventArgs args)
+        void IPlugin.OnStreamUpdate(object sender, StreamUpdateEventArgs args)
         {
             stream.Write(args.Data, 0, args.Data.Length);
             if (!IsPlaying)
                 StartPlay();
         }
 
-        public void OnStreamOver(object sender, StreamOverEventArgs args)
+        void IPlugin.OnStreamOver(object sender, StreamOverEventArgs args)
         {
             IsPlaying = false;
             playTask?.Wait();
+        }
+
+        void IPlugin.OnVolumeUpdate(object sender, VolumeUpdateEventArgs args)
+        {
+            Volume = args.Volume;
         }
 
         void StartPlay()
@@ -75,6 +120,7 @@ namespace OnlineRadio.Plugins.Audio
         #region NAudio
         readonly SlidingStream stream;
         IWavePlayer waveOut;
+        VolumeWaveProvider16 volumeProvider;
         IMp3FrameDecompressor decompressor;
         BufferedWaveProvider bufferedWaveProvider;
         StreamMediaFoundationReader mediaReader;
@@ -123,8 +169,8 @@ namespace OnlineRadio.Plugins.Audio
                         if (waveOut == null)
                         {
                             waveOut = new WaveOutEvent();
-                            VolumeWaveProvider16 volumeProvider = new VolumeWaveProvider16(bufferedWaveProvider);
-                            volumeProvider.Volume = 0.5f;
+                            volumeProvider = new VolumeWaveProvider16(bufferedWaveProvider);
+                            volumeProvider.Volume = Volume;
                             waveOut.Init(volumeProvider);
                             waveOut.Play();
                         }
@@ -166,6 +212,8 @@ namespace OnlineRadio.Plugins.Audio
 
         private void CleanUpAudio()
         {
+            volumeProvider = null;
+
             if (waveOut != null)
             {
                 waveOut.Stop();
@@ -190,7 +238,7 @@ namespace OnlineRadio.Plugins.Audio
         }
         #endregion
 
-        public void Dispose()
+        void IDisposable.Dispose()
         {
             IsPlaying = false;
             if(playTask != null)
