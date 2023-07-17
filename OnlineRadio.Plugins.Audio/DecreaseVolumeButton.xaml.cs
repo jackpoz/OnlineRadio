@@ -32,7 +32,7 @@ namespace OnlineRadio.Plugins.Audio
 
         private void ChangeVolumeBtn_Click(object sender, RoutedEventArgs e)
         {
-            _radio.Volume -= 0.1f;
+            _radio.Volume -= 0.05f;
         }
     }
 }
