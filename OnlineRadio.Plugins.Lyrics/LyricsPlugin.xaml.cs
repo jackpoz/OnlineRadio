@@ -5,9 +5,10 @@ using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using Newtonsoft.Json.Linq;
 using OnlineRadio.Core;
 
 namespace OnlineRadio.Plugins.Lyrics
@@ -18,7 +19,7 @@ namespace OnlineRadio.Plugins.Lyrics
     public partial class LyricsPlugin : UserControl, IVisualPlugin
     {
         const string lyricsUrl = "http://api.musixmatch.com/ws/1.1/matcher.lyrics.get?q_track={0}&q_artist={1}";
-        HttpClient httpClient;
+        readonly HttpClient httpClient;
 
         UserControl IVisualPlugin.Control
         {
@@ -68,8 +69,8 @@ namespace OnlineRadio.Plugins.Lyrics
                 try
                 {
                     var response = await GetResponse(string.Format(lyricsUrl, args.NewSong.Title, args.NewSong.Artist)).ConfigureAwait(false);
-                    JObject json = JObject.Parse(response);
-                    if ((string)json["message"]["header"]["status_code"] == "401")
+                    JsonObject json = JsonNode.Parse(response).AsObject();
+                    if ((int)json["message"]["header"]["status_code"] == 401)
                         SetLyrics("Unathorized call to Lyrics API, please check \"apikey\" parameter in the plugin config file."
                                 + "Current value: \"" + ApiKey + "\"");
                     else

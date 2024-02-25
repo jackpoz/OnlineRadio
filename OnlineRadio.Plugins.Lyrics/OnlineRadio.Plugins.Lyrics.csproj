@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProductVersion>8.0.30703</ProductVersion>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
     <AssemblyTitle>OnlineRadio.Plugins.Lyrics</AssemblyTitle>
     <Product>OnlineRadio.Plugins.Lyrics</Product>
     <Copyright>Copyright ©  2012</Copyright>
@@ -16,8 +16,5 @@
     <ProjectReference Include="..\OnlineRadio.Core\OnlineRadio.Core.csproj">
       <Private>false</Private>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
   </ItemGroup>
 </Project>

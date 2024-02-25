@@ -27,15 +27,12 @@ namespace OnlineRadio.Plugins.Audio
         {
             get
             {
-                if (_buttons == null)
-                {
-                    _buttons = new List<UserControl>()
-                    {
+                _buttons ??=
+                    [
                         new DecreaseVolumeButton(_radio),
                         new IncreaseVolumeButton(_radio),
                         //new MuteUnmuteVolumeButton()
-                    };
-                }
+                    ];
                 return _buttons;
             }
         }
@@ -43,7 +40,7 @@ namespace OnlineRadio.Plugins.Audio
 
         Task playTask;
 
-        Radio _radio;
+        readonly Radio _radio;
 
         string Codec
         {
@@ -119,9 +116,9 @@ namespace OnlineRadio.Plugins.Audio
 
         #region NAudio
         readonly SlidingStream stream;
-        IWavePlayer waveOut;
+        WaveOutEvent waveOut;
         VolumeWaveProvider16 volumeProvider;
-        IMp3FrameDecompressor decompressor;
+        AcmMp3FrameDecompressor decompressor;
         BufferedWaveProvider bufferedWaveProvider;
         StreamMediaFoundationReader mediaReader;
 
@@ -169,8 +166,10 @@ namespace OnlineRadio.Plugins.Audio
                         if (waveOut == null)
                         {
                             waveOut = new WaveOutEvent();
-                            volumeProvider = new VolumeWaveProvider16(bufferedWaveProvider);
-                            volumeProvider.Volume = Volume;
+                            volumeProvider = new VolumeWaveProvider16(bufferedWaveProvider)
+                            {
+                                Volume = Volume
+                            };
                             waveOut.Init(volumeProvider);
                             waveOut.Play();
                         }
@@ -241,8 +240,7 @@ namespace OnlineRadio.Plugins.Audio
         void IDisposable.Dispose()
         {
             IsPlaying = false;
-            if(playTask != null)
-                playTask.Wait();
+            playTask?.Wait();
             stream.Dispose();
         }
     }
@@ -308,7 +306,7 @@ namespace OnlineRadio.Plugins.Audio
             if (_length < count)
                 count = _length;
 
-            if (blocks.Count == 0 && (currentBlock == null || currentBlock.Length == 0))
+            if (blocks.IsEmpty && (currentBlock == null || currentBlock.Length == 0))
                 return 0;
 
             int readCount = 0;
