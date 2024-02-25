@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Xml.Serialization;
 using OnlineRadio.Core;
+using OnlineRadio.GUI.Properties;
 using Point = System.Drawing.Point;
 
 namespace OnlineRadio.GUI
@@ -60,14 +61,19 @@ namespace OnlineRadio.GUI
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            if(radio != null)
+            if (radio != null)
+            {
+                RefreshVolumeValue();
                 radio.Dispose();
+            }
 
             using (StreamWriter sw = new StreamWriter(sourcesPath))
             {
                 XmlSerializer serializer = new XmlSerializer(typeof(List<Source>));
                 serializer.Serialize(sw, sources.ToList());
             }
+
+            Settings.Default.Save();
         }
 
         private async void PlaySourceBtn_Click(object sender, RoutedEventArgs e)
@@ -108,7 +114,10 @@ namespace OnlineRadio.GUI
 
             Source source = (Source)SelectSourceCombo.SelectedValue;
             source.Selected = true;
-            radio = new Radio(source.Url, source.ArtistTitleOrderInverted);
+            radio = new Radio(source.Url, source.ArtistTitleOrderInverted)
+            {
+                Volume = Settings.Default.Volume
+            };
             radio.OnCurrentSongChanged += (s, eventArgs) =>
             {
                 Dispatcher.InvokeAsync(() =>
@@ -164,6 +173,7 @@ namespace OnlineRadio.GUI
             InfoTitleTxt.Text = String.Empty;
             PluginsGrid.Children.Clear();
             ButtonPluginsPanel.Children.Clear();
+            RefreshVolumeValue();
 
             LogMessage("Stopping playing...");
             await Task.Run(() => radio.Stop());
@@ -239,6 +249,11 @@ namespace OnlineRadio.GUI
                     }
                 }
 	        }
+        }
+
+        private void RefreshVolumeValue()
+        {
+            Settings.Default.Volume = radio.Volume;
         }
 
         class GridCells
