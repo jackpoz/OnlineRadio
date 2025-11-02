@@ -144,8 +144,10 @@ namespace OnlineRadio.Core
             {
                 try
                 {
-                    using var streamHandler = await BaseStreamHandler.GetStreamHandler(Url, httpClient);
+                    using var streamHandler = await BaseStreamHandler.GetStreamHandler(Url, httpClient, true);
+                    using var nonIcecastStreamHandler = await BaseStreamHandler.GetStreamHandler(Url, httpClient, false);
                     await streamHandler.StartAsync();
+                    await nonIcecastStreamHandler.StartAsync();
                     {
                         //get the position of metadata
                         int metaInt = streamHandler.GetIceCastMetaInterval();
@@ -159,12 +161,38 @@ namespace OnlineRadio.Core
 
                         OnStreamStart?.Invoke(this, new StreamStartEventArgs(streamHandler.GetCodec()));
 
+                        const string originalPath = "original.mp3";
+                        const string logPath = "debug.txt";
+                        const string nonIceastPath = "nonIceast.mp3";
+                        int totalReadBytes = 0;
+                        if (File.Exists(originalPath))
+                        {
+                            File.Delete(originalPath);
+                        }
+                        using var originalFile = File.OpenWrite(originalPath);
+                        if (File.Exists(nonIceastPath))
+                        {
+                            File.Delete(nonIceastPath);
+                        }
+                        using var nonIceastFile = File.OpenWrite(nonIceastPath);
+                        if (File.Exists(logPath))
+                        {
+                            File.Delete(logPath);
+                        }
+                        using var logFile = File.CreateText(logPath);
+                        //logFile.AutoFlush = true;
+
                         while (Running)
                         {                            
                             if (bufferPosition >= readBytes)
                             {
+                                totalReadBytes += bufferPosition;
                                 (readBytes, buffer) = await streamHandler.ReadAsync();
                                 bufferPosition = 0;
+                                originalFile.Write(buffer, 0, readBytes);
+
+                                var (nonIcecastReadBytes, nonIcecastBuffer) = await nonIcecastStreamHandler.ReadAsync();
+                                nonIceastFile.Write(nonIcecastBuffer, 0, nonIcecastReadBytes);
                             }
                             if (readBytes <= 0)
                             {
@@ -182,11 +210,20 @@ namespace OnlineRadio.Core
                                 }
 
                                 ProcessStreamData(buffer, ref bufferPosition, metaInt - streamPosition);
+                                logFile.WriteLine($"{(totalReadBytes + bufferPosition) / metaInt} | {totalReadBytes + bufferPosition}");
                                 metadataLength = Convert.ToInt32(buffer[bufferPosition++]) * 16;
                                 //check if there's any metadata, otherwise skip to next block
                                 if (metadataLength == 0)
                                 {
-                                    streamPosition = Math.Min(readBytes - bufferPosition, metaInt);
+                                    if (readBytes - bufferPosition < metaInt)
+                                    {
+                                        streamPosition = readBytes - bufferPosition;
+                                    }
+                                    else
+                                    {
+                                        streamPosition = metaInt;
+                                    }
+                                    //streamPosition = Math.Min(readBytes - bufferPosition, metaInt);
                                     ProcessStreamData(buffer, ref bufferPosition, streamPosition);
                                     continue;
                                 }
@@ -202,7 +239,15 @@ namespace OnlineRadio.Core
                                     var metadataBuffer = metadataData.ToArray();
                                     Metadata = Encoding.UTF8.GetString(metadataBuffer);
                                     metadataData.SetLength(0);
-                                    streamPosition = Math.Min(readBytes - bufferPosition, metaInt);
+                                    if (readBytes - bufferPosition < metaInt)
+                                    {
+                                        streamPosition = readBytes - bufferPosition;
+                                    }
+                                    else
+                                    {
+                                        streamPosition = metaInt;
+                                    }
+                                    //streamPosition = Math.Min(readBytes - bufferPosition, metaInt);
                                     ProcessStreamData(buffer, ref bufferPosition, streamPosition);
                                     break;
                                 }
@@ -253,6 +298,8 @@ namespace OnlineRadio.Core
 
         void ProcessStreamData(byte[] buffer, ref int offset, int length)
         {
+            if (length < 0)
+                throw new ArgumentException("Parameter cannot be <0", nameof(length));
             if (length < 1)
                 return;
             if (OnStreamUpdate != null)

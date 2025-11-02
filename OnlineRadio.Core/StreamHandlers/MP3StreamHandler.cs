@@ -14,10 +14,12 @@ namespace OnlineRadio.Core.StreamHandlers
         HttpResponseMessage response;
         Stream socketStream;
         byte[] buffer = new byte[16384];
+        bool iceCast;
 
-        public MP3StreamHandler(string streamUrl, HttpClient httpClient)
+        public MP3StreamHandler(string streamUrl, HttpClient httpClient, bool iceCast = true)
             : base(streamUrl, httpClient)
         {
+            this.iceCast = iceCast;
         }
 
         public async override Task StartAsync()
@@ -25,12 +27,13 @@ namespace OnlineRadio.Core.StreamHandlers
             var request = new HttpRequestMessage
             {
                 RequestUri = new Uri(StreamUrl),
-                Method = HttpMethod.Get,
-                Headers =
-                {
-                    { "icy-metadata", "1" }
-                }
+                Method = HttpMethod.Get
             };
+
+            if (iceCast)
+            {
+                request.Headers.Add("icy-metadata", "1");
+            }
 
             response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
             ToBeDisposed(response);

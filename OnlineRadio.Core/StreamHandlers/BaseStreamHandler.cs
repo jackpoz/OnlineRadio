@@ -10,18 +10,18 @@ namespace OnlineRadio.Core.StreamHandlers
 {
     abstract class BaseStreamHandler : IDisposable
     {
-        public static async Task<BaseStreamHandler> GetStreamHandler(string streamUrl, HttpClient httpClient)
+        public static async Task<BaseStreamHandler> GetStreamHandler(string streamUrl, HttpClient httpClient, bool iceCast)
         {
             if (streamUrl.EndsWith(".m3u", StringComparison.InvariantCultureIgnoreCase))
             {
                 // Handle standard m3u streams (not extended m3u) as normal mp3 streams after retrieving the mp3 url
                 var m3uStreamUrl = await GetStreamUrlFromM3U(streamUrl, httpClient);
-                return new MP3StreamHandler(m3uStreamUrl, httpClient);                    
+                return new MP3StreamHandler(m3uStreamUrl, httpClient, iceCast);                    
             }
             else if (streamUrl.EndsWith(".m3u8", StringComparison.InvariantCultureIgnoreCase))
                 return new M3U8StreamHandler(streamUrl, httpClient);
             else
-                return new MP3StreamHandler(streamUrl, httpClient);
+                return new MP3StreamHandler(streamUrl, httpClient, iceCast);
         }
 
         static async Task<string> GetStreamUrlFromM3U(string streamUrl, HttpClient httpClient)

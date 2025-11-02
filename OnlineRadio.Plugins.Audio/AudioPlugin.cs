@@ -63,6 +63,8 @@ namespace OnlineRadio.Plugins.Audio
         }
         float _volume;
 
+        FileStream _fileStream;
+
         public AudioPlugin(Radio radio)
         {
             _radio = radio;
@@ -78,10 +80,15 @@ namespace OnlineRadio.Plugins.Audio
         {
             Codec = args.Codec;
             _volume = _radio.Volume;
+            const string audioPath = "audio.mp3";
+            if (File.Exists(audioPath))
+                File.Delete(audioPath);
+            _fileStream = File.OpenWrite(audioPath);
         }
 
         void IPlugin.OnStreamUpdate(object sender, StreamUpdateEventArgs args)
         {
+            _fileStream.Write(args.Data);
             stream.Write(args.Data, 0, args.Data.Length);
             if (!IsPlaying)
                 StartPlay();
@@ -91,6 +98,7 @@ namespace OnlineRadio.Plugins.Audio
         {
             IsPlaying = false;
             playTask?.Wait();
+            _fileStream?.Close();
         }
 
         void IPlugin.OnVolumeUpdate(object sender, VolumeUpdateEventArgs args)
