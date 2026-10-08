@@ -116,7 +116,7 @@ namespace OnlineRadio.Plugins.Audio
 
         #region NAudio
         readonly SlidingStream stream;
-        WaveOutEvent waveOut;
+        WaveOut waveOut;
         VolumeWaveProvider16 volumeProvider;
         AcmMp3FrameDecompressor decompressor;
         BufferedWaveProvider bufferedWaveProvider;
@@ -165,7 +165,7 @@ namespace OnlineRadio.Plugins.Audio
 
                         if (waveOut == null)
                         {
-                            waveOut = new WaveOutEvent();
+                            waveOut = new WaveOut();
                             volumeProvider = new VolumeWaveProvider16(bufferedWaveProvider)
                             {
                                 Volume = Volume
@@ -257,7 +257,7 @@ namespace OnlineRadio.Plugins.Audio
 
         public override bool CanSeek
         {
-            get { throw new NotImplementedException(); }
+            get { return false; }
         }
 
         public override bool CanWrite
