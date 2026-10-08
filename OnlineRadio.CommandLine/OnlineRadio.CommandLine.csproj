@@ -5,7 +5,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>OnlineRadio.Console</RootNamespace>
     <AssemblyName>OnlineRadio.Console</AssemblyName>
-    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <TargetFramework>net10.0-windows7.0</TargetFramework>
     <AssemblyTitle>OnlineRadio.Console</AssemblyTitle>
     <Product>OnlineRadio.Console</Product>
     <Copyright>Copyright ©  2012</Copyright>
